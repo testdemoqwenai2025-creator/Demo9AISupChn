@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Platform Architecture | Enterprise AI Supply Chain Infrastructure</title>
+    <meta name="description" content="Enterprise-grade platform architecture with microservices, API integrations, security, and scalability for global supply chain operations.">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-primary: #0a0f1c; --bg-secondary: #111827; --bg-tertiary: #1f2937;
+            --text-primary: #f9fafb; --text-secondary: #9ca3af; --text-muted: #6b7280;
+            --accent-1: #6366f1; --accent-2: #06b6d4; --accent-3: #10b981;
+            --accent-4: #f59e0b; --accent-5: #ef4444; --accent-6: #8b5cf6;
+            --glass-bg: rgba(255,255,255,0.03); --glass-border: rgba(255,255,255,0.08);
+            --shadow-glow: 0 0 60px rgba(99,102,241,0.15);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #ffffff; --bg-secondary: #f9fafb; --bg-tertiary: #e5e7eb;
+            --text-primary: #111827; --text-secondary: #4b5563; --text-muted: #9ca3af;
+            --glass-bg: rgba(0,0,0,0.02); --glass-border: rgba(0,0,0,0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary); color: var(--text-primary);
+            min-height: 100vh; overflow-x: hidden;
+            transition: var(--transition);
+        }
+
+        .bg-animation { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+        .bg-orb { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.12; animation: float 20s ease-in-out infinite; }
+        .bg-orb-1 { width: 600px; height: 600px; top: -200px; right: -200px; background: var(--accent-2); }
+        .bg-orb-2 { width: 500px; height: 500px; bottom: -150px; left: -150px; background: var(--accent-1); animation-delay: -5s; }
+        .bg-orb-3 { width: 400px; height: 400px; top: 40%; left: 40%; background: var(--accent-3); animation-delay: -10s; }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.05); }
+            66% { transform: translate(-20px, 20px) scale(0.95); }
+        }
+
+        header {
+            position: sticky; top: 0; z-index: 100;
+            backdrop-filter: blur(20px); background: rgba(10,15,28,0.8);
+            border-bottom: 1px solid var(--glass-border);
+        }
+        [data-theme="light"] header { background: rgba(255,255,255,0.9); }
+
+        .header-content {
+            max-width: 1920px; margin: 0 auto; padding: 0 2rem; height: 70px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+
+        .logo-section { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; }
+        .logo-icon {
+            width: 44px; height: 44px; border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent-2), var(--accent-3));
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 20px rgba(6,182,212,0.4);
+        }
+        .logo-text h1 { font-size: 18px; font-weight: 700; background: linear-gradient(90deg, var(--accent-2), var(--accent-3)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .logo-text p { font-size: 11px; color: var(--text-secondary); }
+
+        nav { display: flex; gap: 4px; }
+        nav a {
+            padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 500;
+            text-decoration: none; transition: var(--transition); color: var(--text-secondary);
+        }
+        nav a:hover { background: var(--glass-bg); color: var(--text-primary); }
+        nav a.active {
+            background: linear-gradient(135deg, var(--accent-2), var(--accent-3));
+            color: white; box-shadow: 0 4px 15px rgba(6,182,212,0.35);
+        }
+
+        .header-actions { display: flex; align-items: center; gap: 12px; }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 10px 20px; border-radius: 10px; font-size: 14px; font-weight: 600;
+            cursor: pointer; transition: var(--transition); text-decoration: none;
+            border: none; font-family: inherit;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-2), var(--accent-3));
+            color: white; box-shadow: 0 4px 15px rgba(6,182,212,0.3);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(6,182,212,0.45); }
+        .btn-secondary {
+            background: var(--glass-bg); color: var(--text-primary);
+            border: 1px solid var(--glass-border);
+        }
+        .btn-sm { padding: 8px 16px; font-size: 13px; }
+
+        /* ===== SUPER VISIBLE THEME TOGGLE ===== */
+        .theme-toggle { 
+            width: auto; min-width: 120px; height: 44px; 
+            background: linear-gradient(135deg, #6366f1, #06b6d4) !important;
+            border: 3px solid rgba(255,255,255,0.3) !important; 
+            border-radius: 22px !important;
+            cursor: pointer; transition: all 0.3s ease !important; 
+            display: flex !important; align-items: center; justify-content: center;
+            padding: 0 18px !important; gap: 10px !important;
+            box-shadow: 0 4px 20px rgba(99,102,241,0.5), 0 0 40px rgba(99,102,241,0.2) !important;
+            position: relative;
+            animation: pulse-glow 2s ease-in-out infinite !important;
+            z-index: 1000 !important;
+        }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 4px 20px rgba(99,102,241,0.5), 0 0 40px rgba(99,102,241,0.2); }
+            50% { box-shadow: 0 4px 30px rgba(99,102,241,0.7), 0 0 60px rgba(99,102,241,0.4); }
+        }
+        .theme-toggle:hover { 
+            transform: translateY(-3px) scale(1.05) !important;
+            box-shadow: 0 8px 35px rgba(99,102,241,0.7), 0 0 70px rgba(99,102,241,0.5) !important;
+            background: linear-gradient(135deg, #7c3aed, #0891b2) !important;
+        }
+        .toggle-thumb {
+            width: 26px; height: 26px; border-radius: 50% !important;
+            background: rgba(255,255,255,0.95) !important;
+            display: flex !important; align-items: center; justify-content: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2) !important;
+        }
+        .toggle-thumb svg, .toggle-thumb i { 
+            width: 16px !important; height: 16px !important; 
+            color: #6366f1 !important; 
+        }
+        .theme-toggle-label {
+            font-size: 13px !important; font-weight: 800 !important; 
+            color: #ffffff !important;
+            text-transform: uppercase !important; letter-spacing: 1px !important;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3) !important;
+        }
+        
+        /* Light mode toggle styling */
+        [data-theme="light"] .theme-toggle {
+            background: linear-gradient(135deg, #f59e0b, #ef4444) !important;
+            box-shadow: 0 4px 20px rgba(245,158,11,0.5), 0 0 40px rgba(245,158,11,0.2) !important;
+        }
+        [data-theme="light"] .theme-toggle:hover {
+            background: linear-gradient(135deg, #d97706, #dc2626) !important;
+            box-shadow: 0 8px 35px rgba(245,158,11,0.7), 0 0 70px rgba(245,158,11,0.5) !important;
+        }
+
+        main { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 2rem; }
+
+        /* Page Navigation */
+        .page-nav-buttons { display: flex; gap: 10px; margin-bottom: 1rem; }
+        .page-nav-buttons .btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 13px; padding: 8px 16px; border-radius: 8px;
+            transition: var(--transition); text-decoration: none;
+        }
+        .page-nav-buttons .btn:hover {
+            transform: translateY(-2px); box-shadow: 0 4px 12px rgba(99,102,241,0.3);
+        }
+
+        /* Hero Section */
+        .hero { text-align: center; padding: 4rem 2rem; }
+        .badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 8px 20px; border-radius: 50px;
+            background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.3);
+            font-size: 13px; font-weight: 600; color: var(--accent-2);
+            margin-bottom: 1.5rem;
+        }
+        .hero h1 { font-size: 3.5rem; font-weight: 900; line-height: 1.1; margin-bottom: 1.5rem; }
+        .gradient-text { background: linear-gradient(135deg, var(--accent-2), var(--accent-3)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero p { font-size: 1.25rem; color: var(--text-secondary); max-width: 700px; margin: 0 auto 2rem; line-height: 1.7; }
+
+        /* Glass Card */
+        .glass {
+            background: var(--bg-secondary); border: 1px solid var(--glass-border);
+            border-radius: 20px; padding: 2rem; transition: var(--transition);
+        }
+        .glass:hover { transform: translateY(-5px); border-color: rgba(6,182,212,0.3); box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+
+        /* Section Title */
+        .section-title { font-size: 2rem; font-weight: 800; text-align: center; margin: 4rem 0 2rem; }
+
+        /* Architecture Diagram */
+        .architecture-section { margin-top: 3rem; }
+        .arch-diagram {
+            background: var(--bg-secondary); border: 1px solid var(--glass-border);
+            border-radius: 24px; padding: 3rem; position: relative;
+        }
+        
+        .arch-layer {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem; margin-bottom: 2rem;
+        }
+        
+        .arch-component {
+            background: var(--bg-tertiary); border: 1px solid var(--glass-border);
+            border-radius: 16px; padding: 1.5rem; text-align: center;
+            transition: var(--transition); position: relative;
+        }
+        .arch-component:hover {
+            transform: translateY(-5px); border-color: var(--accent-2);
+            box-shadow: 0 10px 40px rgba(6,182,212,0.2);
+        }
+        .arch-icon {
+            width: 56px; height: 56px; border-radius: 14px; margin: 0 auto 1rem;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .arch-component h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .arch-component p { font-size: 13px; color: var(--text-secondary); }
+
+        .layer-label {
+            position: absolute; left: -120px; top: 50%; transform: translateY(-50%);
+            writing-mode: vertical-rl; text-orientation: mixed;
+            font-size: 11px; font-weight: 700; letter-spacing: 2px;
+            color: var(--text-secondary); text-transform: uppercase;
+        }
+
+        /* Integration Cards */
+        .integrations-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+        .integration-card {
+            background: var(--bg-secondary); border: 1px solid var(--glass-border);
+            border-radius: 20px; padding: 2rem; transition: var(--transition);
+        }
+        .integration-card:hover { transform: translateY(-5px); border-color: var(--accent-1); }
+        .integration-icon {
+            width: 64px; height: 64px; border-radius: 16px; margin-bottom: 1.25rem;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .integration-card h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.75rem; }
+        .integration-card p { color: var(--text-secondary); font-size: 14px; line-height: 1.7; margin-bottom: 1rem; }
+        .integration-status {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600;
+        }
+        .status-connected { background: rgba(16,185,129,0.1); color: var(--accent-3); }
+        .status-pending { background: rgba(245,158,11,0.1); color: var(--accent-4); }
+
+        /* Tech Stack */
+        .tech-stack { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 2rem; }
+        .tech-item {
+            padding: 12px 24px; border-radius: 12px;
+            background: var(--bg-secondary); border: 1px solid var(--glass-border);
+            font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px;
+            transition: var(--transition);
+        }
+        .tech-item:hover { border-color: var(--accent-2); transform: translateY(-2px); }
+
+        /* Security Features */
+        .security-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+        .security-card {
+            background: var(--bg-secondary); border: 1px solid var(--glass-border);
+            border-radius: 16px; padding: 1.75rem; transition: var(--transition);
+        }
+        .security-card:hover { border-color: var(--accent-3); }
+        .security-icon {
+            width: 48px; height: 48px; border-radius: 12px; margin-bottom: 1rem;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .security-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .security-card p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem; margin-top: 3rem; padding: 2rem;
+            background: var(--bg-secondary); border: 1px solid var(--glass-border);
+            border-radius: 20px;
+        }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 2.5rem; font-weight: 900; margin-bottom: 0.25rem; }
+        .stat-label { font-size: 13px; color: var(--text-secondary); }
+
+        /* AI Chat Widget */
+        .ai-chat-widget { position: fixed; bottom: 30px; right: 30px; z-index: 1000; }
+        .chat-button {
+            width: 64px; height: 64px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-2), var(--accent-3));
+            border: none; color: white; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 8px 32px rgba(6,182,212,0.5);
+            transition: var(--transition); animation: chatPulse 3s ease-in-out infinite;
+        }
+        @keyframes chatPulse {
+            0%, 100% { box-shadow: 0 8px 32px rgba(6,182,212,0.5); }
+            50% { box-shadow: 0 8px 48px rgba(16,185,129,0.7); }
+        }
+        .chat-button:hover { transform: scale(1.1); }
+
+        .chat-window {
+            position: absolute; bottom: 80px; right: 0;
+            width: 420px; height: 560px;
+            background: var(--bg-secondary); border: 1px solid var(--glass-border);
+            border-radius: 24px; display: none; flex-direction: column;
+            overflow: hidden; box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+            animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .chat-window.open { display: flex; }
+
+        .chat-header {
+            padding: 1.25rem; background: linear-gradient(135deg, var(--accent-2), var(--accent-3));
+            color: white; display: flex; align-items: center; gap: 12px;
+        }
+        .chat-avatar {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: rgba(255,255,255,0.2); display: flex;
+            align-items: center; justify-content: center;
+        }
+        .chat-info h3 { font-size: 15px; font-weight: 700; }
+        .chat-info p { font-size: 12px; opacity: 0.9; }
+        .chat-close { margin-left: auto; background: none; border: none; color: white; cursor: pointer; opacity: 0.8; }
+        .chat-close:hover { opacity: 1; }
+
+        .chat-messages { flex: 1; overflow-y: auto; padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; }
+        .message { max-width: 85%; padding: 12px 16px; border-radius: 16px; font-size: 14px; line-height: 1.5; }
+        .message.ai { background: var(--bg-tertiary); border: 1px solid var(--glass-border); align-self: flex-start; border-bottom-left-radius: 4px; }
+        .message.user { background: linear-gradient(135deg, var(--accent-2), var(--accent-3)); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+
+        .chat-input-area { padding: 1rem; border-top: 1px solid var(--glass-border); display: flex; gap: 10px; }
+        .chat-input {
+            flex: 1; padding: 12px 16px; border-radius: 12px;
+            background: var(--bg-tertiary); border: 1px solid var(--glass-border);
+            color: var(--text-primary); font-size: 14px; font-family: inherit;
+        }
+        .chat-send {
+            width: 48px; height: 48px; border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent-2), var(--accent-3));
+            border: none; color: white; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: var(--transition);
+        }
+        .chat-send:hover { transform: scale(1.05); }
+
+        /* Animations */
+        .animate-in { opacity: 0; transform: translateY(20px); animation: fadeInUp 0.6s ease forwards; }
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+
+        /* Toast */
+        .toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            padding: 14px 28px; border-radius: 12px; color: white;
+            font-size: 14px; font-weight: 600; z-index: 10000;
+            animation: toastIn 0.3s ease;
+        }
+        @keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(20px); } }
+        .toast-success { background: var(--accent-3); }
+        .toast-error { background: var(--accent-5); }
+        .toast-info { background: var(--accent-2); }
+
+        footer {
+            text-align: center; padding: 3rem 2rem; color: var(--text-secondary);
+            border-top: 1px solid var(--glass-border); margin-top: 4rem;
+        }
+        footer a { color: var(--accent-2); text-decoration: none; }
+
+        @media (max-width: 768px) { nav { display: none; } main { padding: 1rem; } .hero h1 { font-size: 2.5rem; } }
+        /* ===== FLOATING THEME TOGGLE (ALWAYS VISIBLE) ===== */
+        .floating-theme-toggle {
+            position: fixed !important;
+            bottom: 30px !important;
+            right: 30px !important;
+            z-index: 99999 !important;
+            background: linear-gradient(135deg, #6366f1, #06b6d4) !important;
+            color: white !important;
+            border: 4px solid rgba(255,255,255,0.5) !important;
+            padding: 18px 32px !important;
+            border-radius: 50px !important;
+            font-size: 18px !important;
+            font-weight: 900 !important;
+            cursor: pointer !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 12px !important;
+            box-shadow: 
+                0 8px 32px rgba(99,102,241,0.6),
+                0 0 80px rgba(99,102,241,0.4),
+                inset 0 2px 10px rgba(255,255,255,0.2) !important;
+            transition: all 0.3s ease !important;
+            animation: float-pulse 2.5s ease-in-out infinite !important;
+            text-transform: uppercase !important;
+            letter-spacing: 2px !important;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+        }
+        
+        @keyframes float-pulse {
+            0%, 100% { 
+                transform: translateY(0) scale(1); 
+                box-shadow: 
+                    0 8px 32px rgba(99,102,241,0.6),
+                    0 0 80px rgba(99,102,241,0.4);
+            }
+            50% { 
+                transform: translateY(-8px) scale(1.03); 
+                box-shadow: 
+                    0 12px 40px rgba(99,102,241,0.8),
+                    0 0 100px rgba(99,102,241,0.6);
+            }
+        }
+        
+        .floating-theme-toggle:hover {
+            transform: translateY(-12px) scale(1.08) !important;
+            box-shadow: 
+                0 16px 50px rgba(99,102,241,0.9),
+                0 0 120px rgba(99,102,241,0.7) !important;
+            background: linear-gradient(135deg, #7c3aed, #0891b2) !important;
+        }
+        
+        [data-theme="light"] .floating-theme-toggle {
+            background: linear-gradient(135deg, #f59e0b, #ef4444) !important;
+            box-shadow: 
+                0 8px 32px rgba(245,158,11,0.6),
+                0 0 80px rgba(245,158,11,0.4) !important;
+        }
+        
+        [data-theme="light"] .floating-theme-toggle:hover {
+            background: linear-gradient(135deg, #d97706, #dc2626) !important;
+            box-shadow: 
+                0 16px 50px rgba(245,158,11,0.9),
+                0 0 120px rgba(245,158,11,0.7) !important;
+        }
+        
+        .floating-toggle-icon {
+            font-size: 24px !important;
+            animation: icon-spin 3s linear infinite;
+        }
+        
+        @keyframes icon-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Mobile adjustment */
+        @media (max-width: 768px) {
+            .floating-theme-toggle {
+                bottom: 20px !important;
+                right: 20px !important;
+                padding: 14px 24px !important;
+                font-size: 14px !important;
+            }
+            .floating-toggle-icon {
+                font-size: 20px !important;
+            }
+        }
+    
+        /* Login & Get Started Buttons */
+        .btn-login { display:inline-flex; align-items:center; gap:6px; padding:8px 18px; border-radius:8px; font-size:13px; font-weight:600; border:1px solid rgba(255,255,255,0.2); background:transparent; color:white; cursor:pointer; transition:all 0.2s ease; text-decoration:none; white-space:nowrap; }
+        .btn-login:hover { background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.3); }
+        .btn-get-started { display:inline-flex; align-items:center; gap:6px; padding:8px 18px; border-radius:8px; font-size:13px; font-weight:600; border:none; background:linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); color:white; cursor:pointer; transition:all 0.2s ease; text-decoration:none; white-space:nowrap; box-shadow:0 4px 15px rgba(16,185,129,0.3); }
+        .btn-get-started:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(16,185,129,0.45); }
+        [data-theme="light"] .btn-login { color:#1E293B; border-color:rgba(0,0,0,0.15); }
+        [data-theme="light"] .btn-login:hover { background:rgba(0,0,0,0.04); }
+        /* Modal overlay */
+        .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); z-index:1000; align-items:center; justify-content:center; }
+        .modal-overlay.open { display:flex; }
+        .modal { background:var(--dark-lighter); border:1px solid rgba(255,255,255,0.1); border-radius:20px; padding:2.5rem; width:100%; max-width:420px; margin:1rem; position:relative; animation:modalIn 0.25s ease-out; }
+        @keyframes modalIn { from { opacity:0; transform:translateY(20px) scale(0.97); } to { opacity:1; transform:translateY(0) scale(1); } }
+        [data-theme="light"] .modal { background:#ffffff; border-color:rgba(0,0,0,0.08); box-shadow:0 20px 60px rgba(0,0,0,0.15); }
+        .modal-close { position:absolute; top:16px; right:16px; width:32px; height:32px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:transparent; color:var(--gray-400); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s; }
+        .modal-close:hover { background:rgba(255,255,255,0.08); color:white; }
+        [data-theme="light"] .modal-close { border-color:rgba(0,0,0,0.1); color:#94A3B8; }
+        [data-theme="light"] .modal-close:hover { background:rgba(0,0,0,0.04); color:#1E293B; }
+        .modal h2 { font-size:1.5rem; font-weight:700; margin-bottom:0.5rem; }
+        .modal p { color:var(--gray-400); font-size:14px; margin-bottom:1.5rem; line-height:1.6; }
+        [data-theme="light"] .modal h2 { color:#0F172A; }
+        [data-theme="light"] .modal p { color:#64748B; }
+        .form-group { margin-bottom:1rem; }
+        .form-group label { display:block; font-size:13px; font-weight:500; margin-bottom:6px; color:var(--gray-300); }
+        [data-theme="light"] .form-group label { color:#475569; }
+        .form-group input { width:100%; padding:10px 14px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.05); color:white; font-size:14px; font-family:inherit; outline:none; transition:border-color 0.2s; }
+        .form-group input:focus { border-color:var(--primary); }
+        .form-group input::placeholder { color:var(--gray-500); }
+        [data-theme="light"] .form-group input { background:#F8FAFC; border-color:rgba(0,0,0,0.12); color:#1E293B; }
+        [data-theme="light"] .form-group input:focus { border-color:#059669; }
+        [data-theme="light"] .form-group input::placeholder { color:#94A3B8; }
+        .form-submit { width:100%; padding:12px; border-radius:10px; border:none; background:linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); color:white; font-size:14px; font-weight:600; cursor:pointer; transition:all 0.2s; margin-top:0.5rem; }
+        .form-submit:hover { box-shadow:0 4px 20px rgba(16,185,129,0.4); }
+        .form-submit:disabled { opacity:0.6; cursor:not-allowed; }
+        .form-footer { text-align:center; margin-top:1.25rem; font-size:13px; color:var(--gray-400); }
+        .form-footer a { color:var(--primary); text-decoration:none; font-weight:500; cursor:pointer; }
+        .form-footer a:hover { text-decoration:underline; }
+        [data-theme="light"] .form-footer { color:#94A3B8; }
+        .modal-success { display:none; text-align:center; padding:1rem 0; }
+        .modal-success .check-circle { width:56px; height:56px; border-radius:50%; background:rgba(16,185,129,0.12); color:var(--primary); display:flex; align-items:center; justify-content:center; margin:0 auto 1rem; }
+        .modal-success h3 { font-size:1.25rem; font-weight:700; margin-bottom:0.5rem; }
+        .modal-success p { margin-bottom:1.5rem; }
+        [data-theme="light"] .modal-success h3 { color:#0F172A; }
+    
+/* ===== UNIFIED SITE FOOTER ===== */
+.site-footer {
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 1) 100%);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 0;
+    margin-top: 3rem;
+    position: relative;
+    overflow: hidden;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+.site-footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.5), rgba(6, 182, 212, 0.5), transparent);
+}
+.sf-glow {
+    position: absolute;
+    width: 400px;
+    height: 200px;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.07;
+    pointer-events: none;
+}
+.sf-glow-1 { top: -80px; left: 10%; background: var(--primary, #10B981); }
+.sf-glow-2 { top: -80px; right: 10%; background: var(--secondary, #06B6D4); }
+.sf-main {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 3rem 2rem 2rem;
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr;
+    gap: 2rem;
+    position: relative;
+    z-index: 1;
+}
+@media (max-width: 1024px) {
+    .sf-main { grid-template-columns: 1fr 1fr 1fr; }
+    .sf-brand-col { grid-column: span 3; margin-bottom: 0.5rem; }
+}
+@media (max-width: 640px) {
+    .sf-main { grid-template-columns: 1fr 1fr; gap: 1.5rem; padding: 2rem 1.25rem 1.5rem; }
+    .sf-brand-col { grid-column: span 2; }
+}
+@media (max-width: 420px) {
+    .sf-main { grid-template-columns: 1fr; }
+    .sf-brand-col { grid-column: span 1; }
+}
+/* Brand column */
+.sf-brand-col {}
+.sf-brand-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1rem;
+    text-decoration: none;
+}
+.sf-brand-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--primary, #10B981), var(--secondary, #06B6D4));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.sf-brand-icon svg { width: 20px; height: 20px; color: white; }
+.sf-brand-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: white;
+    line-height: 1.2;
+}
+.sf-brand-tagline {
+    font-size: 11px;
+    color: rgba(148, 163, 184, 0.8);
+    font-weight: 400;
+}
+.sf-about-text {
+    font-size: 13px;
+    line-height: 1.65;
+    color: rgba(148, 163, 184, 0.9);
+    margin-bottom: 1.25rem;
+    max-width: 320px;
+}
+.sf-socials {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.sf-social-link {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+    text-decoration: none;
+}
+.sf-social-link:hover {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: rgba(16, 185, 129, 0.4);
+    transform: translateY(-2px);
+}
+.sf-social-link svg { width: 16px; height: 16px; color: rgba(148, 163, 184, 0.8); transition: color 0.25s; }
+.sf-social-link:hover svg { color: #10B981; }
+/* Link columns */
+.sf-col-heading {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 1rem;
+}
+.sf-links { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+.sf-links li { margin: 0; }
+.sf-links a {
+    font-size: 13px;
+    color: rgba(148, 163, 184, 0.85);
+    text-decoration: none;
+    transition: color 0.2s, padding-left 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.sf-links a:hover {
+    color: #10B981;
+    padding-left: 3px;
+}
+.sf-links a svg {
+    width: 14px;
+    height: 14px;
+    opacity: 0.6;
+    flex-shrink: 0;
+}
+.sf-links a:hover svg { opacity: 1; }
+/* Contact column specifics */
+.sf-contact-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 0.65rem;
+    font-size: 13px;
+    color: rgba(148, 163, 184, 0.85);
+    line-height: 1.5;
+}
+.sf-contact-item svg {
+    width: 15px;
+    height: 15px;
+    color: rgba(16, 185, 129, 0.7);
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+.sf-contact-item a {
+    color: rgba(148, 163, 184, 0.85);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.sf-contact-item a:hover { color: #10B981; }
+/* Bottom bar */
+.sf-bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 1.25rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    position: relative;
+    z-index: 1;
+}
+.sf-bottom-left {
+    font-size: 12px;
+    color: rgba(100, 116, 139, 0.8);
+}
+.sf-bottom-left a {
+    color: rgba(148, 163, 184, 0.7);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.sf-bottom-left a:hover { color: #10B981; }
+.sf-bottom-right {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+}
+.sf-bottom-right a {
+    font-size: 12px;
+    color: rgba(100, 116, 139, 0.8);
+    text-decoration: none;
+    transition: color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+.sf-bottom-right a:hover { color: #10B981; }
+.sf-gdpr-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 6px;
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(16, 185, 129, 0.9);
+}
+.sf-gdpr-badge svg { width: 12px; height: 12px; }
+@media (max-width: 640px) {
+    .sf-bottom { flex-direction: column; align-items: flex-start; padding: 1rem 1.25rem; }
+    .sf-bottom-right { gap: 0.75rem; }
+}
+</style>
+</head>
+<body>
+    <!-- 🔴 FLOATING THEME TOGGLE (ALWAYS VISIBLE) -->
+    <button class="floating-theme-toggle" onclick="toggleTheme()" id="floatingToggle" aria-label="Toggle dark and light mode">
+        <span class="floating-toggle-icon" id="floatingIcon">🌙</span>
+        <span id="floatingText">☀️ LIGHT MODE</span>
+    </button>
+    <div class="bg-animation"><div class="bg-orb bg-orb-1"></div><div class="bg-orb bg-orb-2"></div><div class="bg-orb bg-orb-3"></div></div>
+
+    <header>
+        <div class="header-content">
+            <a href="./index.html" class="logo-section">
+                <div class="logo-icon"><i data-lucide="server" style="width:24px;height:24px;color:white;"></i></div>
+                <div class="logo-text"><h1>AI Supply Chain</h1><p>Platform Infrastructure</p></div>
+            </a>
+            <nav>
+                <a href="./index.html">Home</a>
+                <a href="./about.html">About</a>
+                <a href="./spa/">Command Center ⭐</a>
+                <a href="./operations.html">Operations Hub</a>
+                <a href="./dashboard.html">Dashboard</a>
+                <a href="./intelligence.html">Intelligence</a>
+                <a href="./platform.html" class="active">Platform</a>
+                <a href="./product.html">Product</a>
+                <a href="./customers.html">Customers</a>
+                <a href="./support.html">Support</a>
+            </nav>
+            <div class="header-actions">
+                <button class="btn-login" onclick="openModal('login')"><i data-lucide="log-in" style="width:14px;height:14px;"></i> Login</button>
+                <button class="btn-get-started" onclick="openModal('getstarted')"><i data-lucide="rocket" style="width:14px;height:14px;"></i> Get Started</button>
+                <button class="theme-toggle" data-tooltip="🌙 Toggle Dark/Light Mode ☀️" onclick="toggleTheme()" aria-label="Toggle dark and light mode">
+                    <div class="toggle-thumb"><i data-lucide="moon" style="width:16px;height:16px;color:#6366f1"></i></div>
+                    <span class="theme-toggle-label">☀️ LIGHT</span>
+                </button>
+                <a href="./spa/" class="btn btn-primary btn-sm">Launch App</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Navigation Buttons -->
+        <div class="page-nav-buttons animate-in">
+            <button onclick="window.history.back()" class="btn btn-secondary btn-sm">
+                <i data-lucide="arrow-left" style="width:16px;"></i> Back
+            </button>
+            <a href="./index.html" class="btn btn-primary btn-sm">
+                <i data-lucide="home" style="width:16px;"></i> Home
+            </a>
+        </div>
+
+        <!-- Hero -->
+        <section class="hero animate-in">
+            <div class="badge"><i data-lucide="layers" style="width:16px;height:16px;"></i> Enterprise Platform v3.0</div>
+            <h1>Scalable <span class="gradient-text">Infrastructure</span></h1>
+            <p>Built for global enterprises. Microservices architecture, real-time processing, and enterprise-grade security at scale.</p>
+            
+            <div class="tech-badges" style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;">
+                <span class="tech-badge">☁️ Cloud-Native</span>
+                <span class="tech-badge">🔒 SOC 2 Type II</span>
+                <span class="tech-badge">⚡ 99.99% Uptime</span>
+                <span class="tech-badge">🌍 Global CDN</span>
+            </div>
+        </section>
+
+        <!-- Architecture Diagram -->
+        <section class="architecture-section">
+            <h2 class="section-title">System Architecture</h2>
+            
+            <div class="arch-diagram animate-in">
+                <!-- Presentation Layer -->
+                <div style="margin-bottom:2rem;">
+                    <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--accent-2);margin-bottom:1rem;">Presentation Layer</div>
+                    <div class="arch-layer">
+                        <div class="arch-component">
+                            <div class="arch-icon" style="background:rgba(99,102,241,0.1)">
+                                <i data-lucide="monitor" style="width:28px;color:#6366f1"></i>
+                            </div>
+                            <h3>Web Dashboard</h3>
+                            <p>React-based UI</p>
+                        </div>
+                        <div class="arch-component">
+                            <div class="arch-icon" style="background:rgba(139,92,246,0.1)">
+                                <i data-lucide="smartphone" style="width:28px;color:#8b5cf6"></i>
+                            </div>
+                            <h3>Mobile Apps</h3>
+                            <p>iOS & Android</p>
+                        </div>
+                        <div class="arch-component">
+                            <div class="arch-icon" style="background:rgba(236,72,153,0.1)">
+                                <i data-lucide="code-2" style="width:28px;color:#ec4899"></i>
+                            </div>
+                            <h3>API Gateway</h3>
+                            <p>REST & GraphQL</p>
+                        </div>
+                        <div class="arch-component">
+                            <div class="arch-icon" style="background:rgba(6,182,212,0.1)">
+                                <i data-lucide="plug" style="width:28px;color:#06b6d4"></i>
+                            </div>
+                            <h3>Webhooks</h3>
+                            <p>Event-driven</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Arrow -->
+                <div style="text-align:center;margin:1rem 0;">
+                    <i data-lucide="chevron-down" style="width:32px;height:32px;color:var(--text-muted)"></i>
+                </div>
+
+                <!-- Application Layer -->
+                <div style="margin-bottom:2rem;">
+                    <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--accent-6);margin-bottom:1rem;">Application Layer</div>
+                    <div class="arch-layer">
+                        <div class="arch-component">
+                            <div class="arch-icon" style="background:rgba(139,92,246,0.1)">
+                                <i data-lucide="brain" style="width:28px;color:#8b5cf6"></i>
+                            </div>
+                            <h3>AI/ML Engine</h3>
+                            <p>PyTorch & TensorFlow</p>
+                        </div>
+                        <div class="arch-component">
+                            <div class="arch-icon" style="background:rgba(16,185,129,0.1)">
+                                <i data-lucide="database" style="width:28px;color:#10b981"></i>
+                            </div>
+                            <h3>Data Processing</h3>
+                            <p>Apache Spark</p>
+                        </div>
+                        <div class="arch-component">
+                            <div class="arch-icon" style="background:rgba(245,158,11,0.1)">
+                                <i data-lucide="bell-ring" style="width:28px;color:#f59e0b"></i>
+                            </div>
+                            <h3>Alert System</h3>
+                            <p>Real-time notifications</p>
+                        </div>
+                        <div class="arch-component">
+                            <div class="arch-icon" style="background:rgba(239,68,68,0.1)">
+                                <i data-lucide="shield-check" style="width:28px;color:#ef4444"></i>
+                            </div>
+                            <h3>Auth Service</h3>
+                            <p>OAuth 2.0 / SSO</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Arrow -->
+                <div style="text-align:center;margin:1rem 0;">
+                    <i data-lucide="chevron-down" style="width:32px;height:32px;color:var(--text-muted)"></i>
+                </div>
+
+                <!-- Data Layer -->
+                <div>
+                    <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--accent-3);margin-bottom:1rem;">Data Layer</div>
+                    <div class="arch-layer">
+                        <div class="arch-component">
+                            <div class="arch-icon" style="background:rgba(16,185,129,0.1)">
+                                <i data-lucide="database" style="width:28px;color:#10b981"></i>
+                            </div>
+                            <h3>PostgreSQL</h3>
+                            <p>Primary database</p>
+                        </div>
+                        <div class="arch-component">
+                            <div class="arch-icon" style="background:rgba(239,68,68,0.1)">
+                                <i data-lucide="flame" style="width:28px;color:#ef4444"></i>
+                            </div>
+                            <h3>Redis Cache</h3>
+                            <p>In-memory store</p>
+                        </div>
+                        <div class="arch-component">
+                            <div class="arch-icon" style="background:rgba(6,182,212,0.1)">
+                                <i data-lucide="cloud" style="width:28px;color:#06b6d4"></i>
+                            </div>
+                            <h3>S3 Storage</h3>
+                            <p>Object storage</p>
+                        </div>
+                        <div class="arch-component">
+                            <div class="arch-icon" style="background:rgba(139,92,246,0.1)">
+                                <i data-lucide="search" style="width:28px;color:#8b5cf6"></i>
+                            </div>
+                            <h3>Elasticsearch</h3>
+                            <p>Search & analytics</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Integrations -->
+        <section id="integrations">
+            <h2 class="section-title">Enterprise Integrations</h2>
+            
+            <div class="integrations-grid">
+                <div class="integration-card animate-in">
+                    <div class="integration-icon" style="background:rgba(255,193,7,0.1)">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/sap/sap-original.svg" alt="SAP" style="width:32px;height:32px">
+                    </div>
+                    <h3>SAP S/4HANA</h3>
+                    <p>Real-time synchronization of purchase orders, invoices, and material master data.</p>
+                    <span class="integration-status status-connected">
+                        <span style="width:8px;height:8px;background:currentColor;border-radius:50%;display:inline-block"></span>
+                        Connected
+                    </span>
+                </div>
+
+                <div class="integration-card animate-in">
+                    <div class="integration-icon" style="background:rgba(0,119,182,0.1)">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/salesforce/salesforce-original.svg" alt="Salesforce" style="width:32px;height:32px">
+                    </div>
+                    <h3>Salesforce</h3>
+                    <p>Bi-directional sync for supplier relationships and CRM data integration.</p>
+                    <span class="integration-status status-connected">
+                        <span style="width:8px;height:8px;background:currentColor;border-radius:50%;display:inline-block"></span>
+                        Connected
+                    </span>
+                </div>
+
+                <div class="integration-card animate-in">
+                    <div class="integration-icon" style="background:rgba(0,136,206,0.1)">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/workday/workday-original.svg" alt="Workday" style="width:32px;height:32px">
+                    </div>
+                    <h3>Workday</h3>
+                    <p>HCM and procurement workflow automation with approval routing.</p>
+                    <span class="integration-status status-pending">
+                        <span style="width:8px;height:8px;background:currentColor;border-radius:50%;display:inline-block"></span>
+                        Pending Setup
+                    </span>
+                </div>
+
+                <div class="integration-card animate-in">
+                    <div class="integration-icon" style="background:rgba(66,133,244,0.1)">
+                        <i data-lucide="google-drive" style="width:32px;height:32px;color:#4285F4"></i>
+                    </div>
+                    <h3>Google Workspace</h3>
+                    <p>Document collaboration, Sheets integration, and automated reporting.</p>
+                    <span class="integration-status status-connected">
+                        <span style="width:8px;height:8px;background:currentColor;border-radius:50%;display:inline-block"></span>
+                        Connected
+                    </span>
+                </div>
+
+                <div class="integration-card animate-in">
+                    <div class="integration-icon" style="background:rgba(88,101,242,0.1)">
+                        <i data-lucide="slack" style="width:32px;height:32px;color:#5865F2"></i>
+                    </div>
+                    <h3>Slack / Teams</h3>
+                    <p>Real-time alerts, approval requests, and team notifications.</p>
+                    <span class="integration-status status-connected">
+                        <span style="width:8px;height:8px;background:currentColor;border-radius:50%;display:inline-block"></span>
+                        Connected
+                    </span>
+                </div>
+
+                <div class="integration-card animate-in">
+                    <div class="integration-icon" style="background:rgba(232,119,34,0.1)">
+                        <i data-lucide="package" style="width:32px;height:32px;color:#E87722"></i>
+                    </div>
+                    <h3>Custom ERP</h3>
+                    <p>RESTful APIs for seamless integration with any legacy or custom system.</p>
+                    <span class="integration-status status-pending">
+                        <span style="width:8px;height:8px;background:currentColor;border-radius:50%;display:inline-block"></span>
+                        Available
+                    </span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Security Features -->
+        <section id="security">
+            <h2 class="section-title">Enterprise Security</h2>
+            
+            <div class="security-grid">
+                <div class="security-card animate-in">
+                    <div class="security-icon" style="background:rgba(16,185,129,0.1)">
+                        <i data-lucide="shield-check" style="width:24px;color:#10b981"></i>
+                    </div>
+                    <h3>SOC 2 Type II Certified</h3>
+                    <p>Annual audits by independent third-party assessors ensure compliance with strict security standards.</p>
+                </div>
+
+                <div class="security-card animate-in">
+                    <div class="security-icon" style="background:rgba(99,102,241,0.1)">
+                        <i data-lucide="lock" style="width:24px;color:#6366f1"></i>
+                    </div>
+                    <h3>End-to-End Encryption</h3>
+                    <p>AES-256 encryption for data at rest and TLS 1.3 for all data in transit.</p>
+                </div>
+
+                <div class="security-card animate-in">
+                    <div class="security-icon" style="background:rgba(245,158,11,0.1)">
+                        <i data-lucide="user-check" style="width:24px;color:#f59e0b"></i>
+                    </div>
+                    <h3>SSO & MFA</h3>
+                    <p>Enterprise SSO support (SAML, Okta, Azure AD) with mandatory multi-factor authentication.</p>
+                </div>
+
+                <div class="security-card animate-in">
+                    <div class="security-icon" style="background:rgba(239,68,68,0.1)">
+                        <i data-lucide="file-search" style="width:24px;color:#ef4444"></i>
+                    </div>
+                    <h3>Audit Logging</h3>
+                    <p>Complete audit trail of all user actions, data access, and system changes with 7-year retention.</p>
+                </div>
+
+                <div class="security-card animate-in">
+                    <div class="security-icon" style="background:rgba(6,182,212,0.1)">
+                        <i data-lucide="globe" style="width:24px;color:#06b6d4"></i>
+                    </div>
+                    <h3>GDRP Compliant</h3>
+                    <p>Data residency options across EU, US, and APAC regions with full GDPR compliance.</p>
+                </div>
+
+                <div class="security-card animate-in">
+                    <div class="security-icon" style="background:rgba(139,92,246,0.1)">
+                        <i data-lucide="scan-line" style="width:24px;color:#8b5cf6"></i>
+                    </div>
+                    <h3>Penetration Testing</h3>
+                    <p>Quarterly penetration tests by leading cybersecurity firms with continuous vulnerability scanning.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tech Stack -->
+        <section id="techstack">
+            <h2 class="section-title">Technology Stack</h2>
+            
+            <div class="tech-stack animate-in">
+                <div class="tech-item"><i data-lucide="container" style="width:16px;color:#3178C6"></i> Kubernetes</div>
+                <div class="tech-item"><i data-lucide="database" style="width:16px;color:#336791"></i> PostgreSQL</div>
+                <div class="tech-item"><i data-lucide="flame" style="width:16px;color:#DC382D"></i> Redis</div>
+                <div class="tech-item"><i data-lucide="cloud" style="width:16px;color:#FF9900"></i> AWS</div>
+                <div class="tech-item"><i data-lucide="brain" style="width:16px;color:#FF6F00"></i> PyTorch</div>
+                <div class="tech-item"><i data-lucide="code-2" style="width:16px;color:#61DAFB"></i> React</div>
+                <div class="tech-item"><i data-lucide="server" style="width:16px,color:#339933"></i> Node.js</div>
+                <div class="tech-item"><i data-lucide="search" style="width:16px;color:#005571"></i> Elasticsearch</div>
+                <div class="tech-item"><i data-lucide="git-branch" style="width:16px;color:#F05032"></i> GitLab CI/CD</div>
+                <div class="tech-item"><i data-lucide="bar-chart-3" style="width:16px;color:#FF6384"></i> Grafana</div>
+            </div>
+        </section>
+
+        <!-- Performance Stats -->
+        <div class="stats-bar animate-in">
+            <div class="stat-item">
+                <div class="stat-value" style="color:var(--accent-2)">99.99%</div>
+                <div class="stat-label">Uptime SLA</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" style="color:var(--accent-3)">&lt;50ms</div>
+                <div class="stat-label">API Response</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" style="color:var(--accent-6)">10PB+</div>
+                <div class="stat-label">Data Processed</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" style="color:var(--accent-4)">150+</div>
+                <div class="stat-label">API Endpoints</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" style="color:var(--accent-1)">42</div>
+                <div class="stat-label">Global Regions</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- AI Chat Widget -->
+    <div class="ai-chat-widget">
+        <button class="chat-button" onclick="toggleAIChat()" aria-label="Open AI Chat">
+            <i data-lucide="message-circle" style="width:28px;height:28px"></i>
+        </button>
+        
+        <div class="chat-window" id="chatWindow">
+            <div class="chat-header">
+                <div class="chat-avatar"><i data-lucide="server" style="width:22px;height:22px"></i></div>
+                <div class="chat-info">
+                    <h3>Platform Expert</h3>
+                    <p>Architecture, integrations, security</p>
+                </div>
+                <button class="chat-close" onclick="toggleAIChat()"><i data-lucide="x" style="width:20px;height:20px"></i></button>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="message ai">
+                    Hello! I'm your Platform Architecture Expert. I can help you understand:
+                    <br><br>
+                    🏗️ **System Architecture** - How components work together<br>
+                    🔗 **Integrations** - Connect your existing systems<br>
+                    🔒 **Security** - Compliance and data protection<br>
+                    ⚡ **Performance** - Scalability and optimization<br><br>
+                    What would you like to know?
+                </div>
+            </div>
+            
+            <div class="chat-input-area">
+                <input type="text" class="chat-input" id="chatInput" placeholder="Ask about platform architecture..." onkeypress="if(event.key==='Enter')sendMessage()">
+                <button class="chat-send" onclick="sendMessage()"><i data-lucide="send" style="width:18px;height:18px"></i></button>
+            </div>
+        </div>
+    </div>
+
+    
+    <!-- Login Modal -->
+    <div class="modal-overlay" id="modal-login" onclick="if(event.target===this)closeModal('login')">
+        <div class="modal">
+            <button class="modal-close" onclick="closeModal('login')"><i data-lucide="x" style="width:16px;height:16px;"></i></button>
+            <div id="login-form-view">
+                <h2>Welcome Back</h2>
+                <p>Sign in to access your AI Supply Chain dashboard and intelligence tools.</p>
+                <form onsubmit="handleLogin(event)">
+                    <div class="form-group"><label>Email</label><input type="email" placeholder="you@company.com" required id="login-email"></div>
+                    <div class="form-group"><label>Password</label><input type="password" placeholder="Enter your password" required id="login-password" minlength="6"></div>
+                    <button type="submit" class="form-submit">Sign In</button>
+                </form>
+                <div class="form-footer">Don't have an account? <a onclick="closeModal('login');openModal('getstarted')">Get Started</a></div>
+            </div>
+            <div class="modal-success" id="login-success">
+                <div class="check-circle"><i data-lucide="check" style="width:28px;height:28px;"></i></div>
+                <h3>Login Successful</h3>
+                <p>Welcome back! Redirecting to your Command Center...</p>
+                <button class="form-submit" onclick="window.location.href='./spa/'">Go to Command Center</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Get Started Modal -->
+    <div class="modal-overlay" id="modal-getstarted" onclick="if(event.target===this)closeModal('getstarted')">
+        <div class="modal">
+            <button class="modal-close" onclick="closeModal('getstarted')"><i data-lucide="x" style="width:16px;height:16px;"></i></button>
+            <div id="getstarted-form-view">
+                <h2>Get Started Free</h2>
+                <p>Create your account and start exploring AI-powered supply chain intelligence in minutes.</p>
+                <form onsubmit="handleGetStarted(event)">
+                    <div class="form-group"><label>Full Name</label><input type="text" placeholder="John Smith" required id="gs-name"></div>
+                    <div class="form-group"><label>Work Email</label><input type="email" placeholder="you@company.com" required id="gs-email"></div>
+                    <div class="form-group"><label>Company</label><input type="text" placeholder="Company name" required id="gs-company"></div>
+                    <div class="form-group"><label>Password</label><input type="password" placeholder="Min. 8 characters" required id="gs-password" minlength="8"></div>
+                    <button type="submit" class="form-submit">Create Account</button>
+                </form>
+                <div class="form-footer">Already have an account? <a onclick="closeModal('getstarted');openModal('login')">Sign In</a></div>
+            </div>
+            <div class="modal-success" id="getstarted-success">
+                <div class="check-circle"><i data-lucide="check" style="width:28px;height:28px;"></i></div>
+                <h3>Account Created!</h3>
+                <p>Your free trial is ready. Launching the Command Center...</p>
+                <button class="form-submit" onclick="window.location.href='./spa/'">Launch Command Center</button>
+            </div>
+        </div>
+    </div>
+<footer class="site-footer">
+    <div class="sf-glow sf-glow-1"></div>
+    <div class="sf-glow sf-glow-2"></div>
+    <div class="sf-main">
+        <!-- Brand + About + Social -->
+        <div class="sf-brand-col">
+            <a href="./index.html" class="sf-brand-logo">
+                <div class="sf-brand-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+                </div>
+                <div>
+                    <div class="sf-brand-name">AI Supply Chain Advanced</div>
+                    <div class="sf-brand-tagline">Enterprise Intelligence Platform</div>
+                </div>
+            </a>
+            <p class="sf-about-text">Empowering global enterprises with AI-driven supply chain intelligence, real-time risk monitoring, regulatory compliance automation, and predictive analytics across every industry vertical.</p>
+            <div class="sf-socials">
+                <a href="https://www.linkedin.com/company/aisupplychain-advanced" target="_blank" rel="noopener noreferrer" class="sf-social-link" aria-label="LinkedIn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                </a>
+                <a href="https://x.com/AISupChnAdvanced" target="_blank" rel="noopener noreferrer" class="sf-social-link" aria-label="X (Twitter)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                </a>
+                <a href="https://www.facebook.com/AISupplyChainAdvanced" target="_blank" rel="noopener noreferrer" class="sf-social-link" aria-label="Facebook">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                </a>
+                <a href="https://www.instagram.com/aisupplychain.advanced" target="_blank" rel="noopener noreferrer" class="sf-social-link" aria-label="Instagram">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+                </a>
+                <a href="https://github.com/testdemoqwenai2025-creator/Demo9AISupChn" target="_blank" rel="noopener noreferrer" class="sf-social-link" aria-label="GitHub">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                </a>
+            </div>
+        </div>
+        <!-- Platform -->
+        <div>
+            <div class="sf-col-heading">Platform</div>
+            <ul class="sf-links">
+                <li><a href="./dashboard.html"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>Dashboard</a></li>
+                <li><a href="./intelligence.html"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h5"/><path d="M17 12h5"/><path d="m12 2 1.09 3.26L12 8.53l-1.09-3.27L12 2Z"/><path d="m12 15.47 1.09 3.27L12 22l-1.09-3.26 1.09-3.27Z"/><path d="m2 12 3.26-1.09L8.53 12l-3.27 1.09L2 12Z"/><path d="m15.47 12 3.27 1.09L22 12l-3.26-1.09-3.27 1.09Z"/><circle cx="12" cy="12" r="4"/></svg>Intelligence</a></li>
+                <li><a href="./platform.html"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>Architecture</a></li>
+                <li><a href="./product.html"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>Products</a></li>
+                <li><a href="./spa/"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>Command Center</a></li>
+                <li><a href="./pricing.html"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg>Pricing</a></li>
+            </ul>
+        </div>
+        <!-- Company -->
+        <div>
+            <div class="sf-col-heading">Company</div>
+            <ul class="sf-links">
+                <li><a href="./about.html"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>About Us</a></li>
+                <li><a href="./customers.html"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Customers</a></li>
+                <li><a href="./industries.html"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M17 18h1"/><path d="M12 18h1"/><path d="M7 18h1"/></svg>Industries</a></li>
+                <li><a href="./events.html"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Events</a></li>
+                <li><a href="./support.html"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Support</a></li>
+            </ul>
+        </div>
+        <!-- Legal -->
+        <div>
+            <div class="sf-col-heading">Legal & Compliance</div>
+            <ul class="sf-links">
+                <li><a href="#" onclick="return false;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>Privacy Policy</a></li>
+                <li><a href="#" onclick="return false;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>Terms of Service</a></li>
+                <li><a href="#" onclick="return false;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>Cookie Policy</a></li>
+                <li><a href="#" onclick="return false;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>GDPR Compliance</a></li>
+                <li><a href="#" onclick="return false;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="m10 13-2 2 2 2"/><path d="m14 17 2-2-2-2"/></svg>Data Processing</a></li>
+            </ul>
+        </div>
+        <!-- Contact -->
+        <div>
+            <div class="sf-col-heading">Contact</div>
+            <div class="sf-contact-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                <a href="mailto:testdemoqwenai2025@gmail.com">testdemoqwenai2025@gmail.com</a>
+            </div>
+            <div class="sf-contact-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                <span>+44 (0) 20 7946 0958</span>
+            </div>
+            <div class="sf-contact-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span>71-75 Shelton Street, Covent Garden, London, WC2H 9JQ, United Kingdom</span>
+            </div>
+            <div class="sf-contact-item" style="margin-top: 0.75rem;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                <a href="https://testdemoqwenai2025-creator.github.io/Demo9AISupChn/" target="_blank" rel="noopener noreferrer">Live Demo Preview</a>
+            </div>
+        </div>
+    </div>
+    <!-- Bottom Bar -->
+    <div class="sf-bottom">
+        <div class="sf-bottom-left">
+            &copy; 2026 AI Supply Chain Advanced. All rights reserved. Built with precision in London, United Kingdom.
+        </div>
+        <div class="sf-bottom-right">
+            <span class="sf-gdpr-badge">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+                GDPR Compliant
+            </span>
+            <a href="#" onclick="return false;">Accessibility</a>
+            <a href="#" onclick="return false;">Sitemap</a>
+            <a href="https://github.com/testdemoqwenai2025-creator/Demo9AISupChn" target="_blank" rel="noopener noreferrer">Repository</a>
+        </div>
+    </div>
+</footer>
+
+    <script>
+        lucide.createIcons();
+
+        // Theme Toggle
+        function toggleTheme() {
+            console.log('🎨 toggleTheme() called!');
+            
+            const current = document.documentElement.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            
+            // Update floating button
+            const floatingIcon = document.getElementById('floatingIcon');
+            const floatingText = document.getElementById('floatingText');
+            
+            if (floatingIcon && floatingText) {
+                floatingIcon.textContent = next === 'dark' ? '🌙' : '☀️';
+                floatingText.textContent = next === 'dark' ? '☀️ LIGHT MODE' : '🌙 DARK MODE';
+            }
+            
+            // Update header toggle buttons if they exist
+            document.querySelectorAll('.toggle-thumb').forEach(thumb => {
+                thumb.innerHTML = next === 'dark' ? '<i data-lucide="moon" style="width:16px;height:16px;color:#6366f1"></i>' : '<i data-lucide="sun" style="width:16px;height:16px;color:#f59e0b"></i>';
+            });
+            
+            document.querySelectorAll('.theme-toggle-label').forEach(label => {
+                label.textContent = next === 'dark' ? '☀️ LIGHT' : '🌙 DARK';
+                label.style.color = '#ffffff';
+            });
+            
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+            
+            console.log(`✅ Theme switched to: ${next.toUpperCase()}`);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        });
+        
+        // Initialize floating button state
+        window.addEventListener('DOMContentLoaded', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+            const floatingIcon = document.getElementById('floatingIcon');
+            const floatingText = document.getElementById('floatingText');
+            
+            if (floatingIcon && floatingText) {
+                floatingIcon.textContent = currentTheme === 'dark' ? '🌙' : '☀️';
+                floatingText.textContent = currentTheme === 'dark' ? '☀️ LIGHT MODE' : '🌙 DARK MODE';
+            }
+            
+            console.log('✅ Floating toggle ready! Click bottom-right button.');
+        });
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // AI Chat
+        let chatOpen = false;
+
+        function toggleAIChat() {
+            const chatWindow = document.getElementById('chatWindow');
+            chatOpen = !chatOpen;
+            chatWindow.classList.toggle('open', chatOpen);
+            if(chatOpen) document.getElementById('chatInput').focus();
+        }
+
+        const aiResponses = {
+            'api': `Our **API Architecture** is designed for enterprise scale:
+
+🔹 **RESTful API**: 150+ endpoints covering all features  
+🔹 **GraphQL**: Flexible queries for complex data needs  
+🔹 **Rate Limiting**: Tiered limits (1K-100K req/min)  
+🔹 **Authentication**: OAuth 2.0 + API Keys  
+🔹 **Documentation**: Interactive Swagger/OpenAPI docs  
+
+**Quick Start:**
+\`\`\`bash
+curl -X GET "https://api.aisupplychain.ai/v3/suppliers" \\
+  -H "Authorization: Bearer YOUR_TOKEN"
+\`\`\`
+
+Would you like specific endpoint examples?`,
+
+            'security': `**Enterprise Security Features:**
+
+🔒 **Encryption**
+• AES-256 at rest
+• TLS 1.3 in transit
+• Field-level encryption for PII
+
+🛡️ **Access Control**
+• Role-Based Access (RBAC)
+• Attribute-Based Access (ABAC)
+• IP allowlisting
+
+✅ **Compliance**
+• SOC 2 Type II
+• GDPR ready
+• HIPAA available
+
+📋 **Audit Logs**
+• All actions logged
+• 7-year retention
+• Real-time streaming to SIEM`,
+
+            'deploy': `**Deployment Options:**
+
+☁️ **Cloud (Recommended)**
+• AWS, Azure, GCP
+• Multi-region deployment
+• Auto-scaling enabled
+
+🏢 **On-Premise**
+• Private cloud support
+• Air-gapped option available
+• Dedicated infrastructure
+
+🚀 **Hybrid**
+• Edge computing nodes
+• Local data caching
+• Sync with cloud core
+
+**Typical Deployment Time:** 2-4 weeks
+**Support:** 24/7 enterprise SLA`,
+
+            'default': `I can help you understand our platform! Try asking about:
+
+🔗 **Integrations** - SAP, Salesforce, etc.
+🔐 **Security** - Compliance & encryption
+⚙️ **API** - Endpoints & authentication
+🚀 **Deployment** - Cloud, on-prem, hybrid
+📊 **Performance** - Scaling & optimization
+
+What would you like to explore?`
+        };
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if(!message) return;
+
+            addMessage(message, 'user');
+            input.value = '';
+
+            setTimeout(() => {
+                let response = aiResponses.default;
+                const lowerMsg = message.toLowerCase();
+                
+                if(lowerMsg.includes('api') || lowerMsg.includes('endpoint')) response = aiResponses.api;
+                else if(lowerMsg.includes('security') || lowerMsg.includes('compliance')) response = aiResponses.security;
+                else if(lowerMsg.includes('deploy') || lowerMsg.includes('host')) response = aiResponses.deploy;
+                
+                addMessage(response, 'ai');
+            }, 800);
+        }
+
+        function addMessage(text, sender) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            messageDiv.innerHTML = text.replace(/\n/g, '<br>');
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Scroll animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting) entry.target.classList.add('animated');
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.animate-in').forEach(el => observer.observe(el));
+
+        // ===== MODALS =====
+        function openModal(t){document.getElementById('modal-'+t).classList.add('open');document.body.style.overflow='hidden';var f=document.getElementById(t+'-form-view'),s=document.getElementById(t+'-success');if(f)f.style.display='block';if(s)s.style.display='none';lucide.createIcons()}
+        function closeModal(t){document.getElementById('modal-'+t).classList.remove('open');document.body.style.overflow=''}
+        function handleLogin(e){e.preventDefault();var b=e.target.querySelector('.form-submit');b.disabled=true;b.textContent='Signing in...';setTimeout(function(){document.getElementById('login-form-view').style.display='none';document.getElementById('login-success').style.display='block';lucide.createIcons()},1200)}
+        function handleGetStarted(e){e.preventDefault();var b=e.target.querySelector('.form-submit');b.disabled=true;b.textContent='Creating account...';setTimeout(function(){document.getElementById('getstarted-form-view').style.display='none';document.getElementById('getstarted-success').style.display='block';lucide.createIcons()},1500)}
+        document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeModal('login');closeModal('getstarted')}});
+    </script>
+<script src="/Demo9AISupChn/js/banners.js" defer></script>
+</body>
+</html>

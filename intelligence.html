@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI/ML Intelligence | AI Supply Chain Advanced - Explainable AI</title>
+    <meta name="description" content="Explore our explainable AI engine with SHAP explanations, model performance metrics, and ML capabilities for supply chain intelligence.">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #10B981; --secondary: #06B6D4; --accent: #8B5CF6;
+            --warning: #F59E0B; --danger: #EF4444; --success: #22C55E;
+            --dark: #0F172A; --dark-lighter: #1E293B;
+            --gray-100: #F1F5F9; --gray-200: #E2E8F0; --gray-300: #CBD5E1;
+            --gray-400: #94A3B8; --gray-500: #64748B; --gray-600: #475569;
+            --gradient-start: #059669; --gradient-end: #0891B2;
+        }
+        
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: linear-gradient(135deg, var(--dark) 0%, var(--dark-lighter) 50%, var(--dark) 100%); color: white; min-height: 100vh; overflow-x: hidden; }
+        .bg-animation { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+        .bg-orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.15; animation: pulse 8s ease-in-out infinite; }
+        .bg-orb-1 { width: 500px; height: 500px; top: -100px; right: -100px; background: var(--primary); }
+        .bg-orb-2 { width: 400px; height: 400px; top: 50%; left: -100px; background: var(--secondary); animation-delay: 2s; }
+        .bg-orb-3 { width: 350px; height: 350px; bottom: -50px; right: 30%; background: var(--accent); animation-delay: 4s; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.15; } 50% { transform: scale(1.1); opacity: 0.25; } }
+        
+        header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); background: rgba(15, 23, 42, 0.85); border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .header-content { max-width: 1920px; margin: 0 auto; padding: 0 2rem; height: 64px; display: flex; align-items: center; justify-content: space-between; }
+        .logo-section { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; }
+        .logo-icon { width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(16, 185, 129, 0.35); }
+        .logo-text h1 { font-size: 18px; font-weight: 700; background: linear-gradient(90deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .logo-text p { font-size: 11px; color: var(--gray-400); }
+        
+        nav { display: flex; gap: 4px; flex-wrap: wrap; }
+        nav a { padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 500; text-decoration: none; transition: all 0.3s ease; color: var(--gray-300); white-space: nowrap; }
+        nav a:hover { background: rgba(255, 255, 255, 0.1); color: white; }
+        nav a.active { background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); color: white; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35); }
+        .mobile-menu-btn { display: none; background: none; border: none; color: white; cursor: pointer; padding: 8px; }
+        
+        main { position: relative; z-index: 1; max-width: 1280px; margin: 0 auto; padding: 2rem; }
+        
+        .hero { text-align: center; padding: 4rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 4rem; position: relative; overflow: hidden; }
+        .hero::before { content:''; position:absolute; top:20%;left:30%;width:400px;height:400px;background:var(--accent);border-radius:50%;filter:blur(120px);opacity:0.08; }
+        .badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 16px; border-radius: 9999px; border: 1px solid rgba(255, 255, 255, 0.2); font-size: 13px; font-weight: 500; margin-bottom: 1.5rem; color: var(--accent); }
+        h1 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; line-height: 1.1; margin-bottom: 1.5rem; }
+        .gradient-text { background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero p { font-size: 1.25rem; color: var(--gray-300); max-width: 650px; margin: 0 auto 2rem; line-height: 1.7; }
+        
+        .tech-badges { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+        .tech-badge { padding: 8px 16px; border-radius: 8px; background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.2); font-size: 13px; font-weight: 500; color: var(--gray-300); }
+        
+        section { padding: 4rem 0; }
+        .section-title { font-size: 2rem; font-weight: 700; text-align: center; margin-bottom: 1rem; }
+        .section-subtitle { text-align: center; color: var(--gray-400); max-width: 600px; margin: 0 auto 3rem; line-height: 1.7; }
+        
+        .glass { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 2rem; transition: all 0.3s ease; }
+        .glass:hover { transform: translateY(-3px); border-color: rgba(139, 92, 246, 0.3); }
+        
+        /* Capabilities Grid */
+        .capabilities-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+        .cap-card { cursor: pointer; }
+        .cap-icon { width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(6, 182, 212, 0.15)); display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; transition: transform 0.3s ease; }
+        .cap-card:hover .cap-icon { transform: scale(1.1); }
+        .cap-card h3 { font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .cap-card p { font-size: 0.875rem; color: var(--gray-400); line-height: 1.6; margin-bottom: 1rem; }
+        .cap-stats { display: flex; justify-content: space-between; align-items: center; }
+        .cap-accuracy { font-size: 1.5rem; font-weight: 700; color: var(--primary); }
+        .cap-trend { padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; background: rgba(34, 197, 94, 0.1); color: var(--success); border: 1px solid rgba(34, 197, 94, 0.2); }
+        
+        /* SHAP Section */
+        .shap-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem; }
+        @media (max-width: 768px) { .shap-grid { grid-template-columns: 1fr; } }
+        
+        .shap-item { margin-bottom: 1.25rem; }
+        .shap-header { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 6px; }
+        .shap-value { font-family: 'monospace'; font-weight: 600; }
+        .shap-value.positive { color: #f43f5e; }
+        .shap-value.negative { color: #10b981; }
+        .shap-bar-bg { height: 8px; background: rgba(255, 255, 255, 0.06); border-radius: 4px; overflow: hidden; }
+        .shap-bar-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
+        
+        .prediction-box { margin-top: 1.5rem; padding: 1.25rem; background: rgba(244, 63, 94, 0.08); border-radius: 12px; border: 1px solid rgba(244, 63, 94, 0.15); display: flex; justify-content: space-between; align-items: center; }
+        .prediction-label { font-weight: 600; }
+        .prediction-value { font-size: 1.75rem; font-weight: 800; color: #f43f5e; }
+        
+        .chart-container { height: 280px; position: relative; }
+        
+        /* Model Stats */
+        .model-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 2rem; }
+        @media (max-width: 480px) { .model-stats { grid-template-columns: 1fr; } }
+        .stat-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(255, 255, 255, 0.03); border-radius: 10px; }
+        .stat-badge { padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; background: rgba(139, 92, 246, 0.15); color: var(--accent); }
+        
+        /* Agent Cards */
+        .agents-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+        .agent-icon { width: 56px; height: 56px; border-radius: 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; transition: transform 0.3s ease; }
+        .agent-card:hover .agent-icon { transform: scale(1.1); }
+        .agent-card h3 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .agent-card p { font-size: 0.875rem; color: var(--gray-400); line-height: 1.6; margin-bottom: 1rem; }
+        .agent-list { list-style: none; }
+        .agent-list li { display: flex; align-items: center; gap: 8px; font-size: 14px; margin-bottom: 8px; color: var(--gray-300); }
+        .agent-list i { color: var(--success); width: 16px; height: 16px; }
+        
+        /* CTA */
+        .cta-section { text-align: center; padding: 4rem 2rem; }
+        .cta-card { max-width: 700px; margin: 0 auto; padding: 3rem; background: linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(6, 182, 212, 0.05)); border: 1px solid rgba(139, 92, 246, 0.2); border-radius: 20px; }
+        .cta-icon { width: 64px; height: 64px; margin: 0 auto 1.5rem; color: var(--accent); }
+        .cta-card h2 { font-size: 2rem; font-weight: 700; margin-bottom: 1rem; }
+        .cta-card p { color: var(--gray-400); margin-bottom: 2rem; max-width: 450px; margin-left: auto; margin-right: auto; line-height: 1.7; }
+        
+        .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 28px; border-radius: 10px; font-size: 15px; font-weight: 600; border: none; cursor: pointer; transition: all 0.3s ease; text-decoration: none; }
+        .btn-primary { background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); color: white; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(16, 185, 129, 0.5); }
+        .btn-outline { background: transparent; border: 1px solid rgba(255, 255, 255, 0.2); color: white; }
+        .btn-outline:hover { background: rgba(255, 255, 255, 0.1); }
+        
+        footer { position: relative; z-index: 1; border-top: 1px solid rgba(255, 255, 255, 0.1); padding: 2rem; text-align: center; color: var(--gray-500); font-size: 0.875rem; margin-top: 4rem; }
+        footer a { color: var(--primary); text-decoration: none; }
+        
+        @media (max-width: 1024px) {
+            nav { display: none; position: absolute; top: 64px; left: 0; right: 0; background: rgba(15, 23, 42, 0.95); padding: 1rem; flex-direction: column; }
+            nav.open { display: flex; } .mobile-menu-btn { display: block; } nav a { padding: 12px 16px; }
+        }
+        @media (max-width: 640px) { main { padding: 1rem; } .header-content { padding: 0 1rem; } h1 { font-size: 2rem; } }
+
+        /* Light mode toggle styling */
+
+        /* Mobile adjustment */
+        @media (max-width: 768px) {
+        }
+            /* Elegant Theme Toggle (CC-consistent) */
+        .cc-theme-toggle {
+            width: 36px; height: 36px;
+            padding: 0; border-radius: 8px;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--gray-400);
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+        .cc-theme-toggle:hover {
+            background: rgba(255,255,255,0.08);
+            color: var(--primary);
+            border-color: rgba(16,185,129,0.3);
+        }
+        .cc-theme-toggle svg { width: 16px; height: 16px; }
+
+        /* Light Theme */
+        [data-theme="light"] body {
+            background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 50%, #F8FAFC 100%);
+            color: #1E293B;
+        }
+        [data-theme="light"] header {
+            background: rgba(248,250,252,0.9);
+            border-bottom-color: rgba(0,0,0,0.08);
+        }
+        [data-theme="light"] nav a { color: #64748B; }
+        [data-theme="light"] nav a:hover { background: rgba(0,0,0,0.05); color: #1E293B; }
+        [data-theme="light"] nav a.active { color: white; }
+        [data-theme="light"] .glass {
+            background: rgba(255,255,255,0.7);
+            border-color: rgba(0,0,0,0.08);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        [data-theme="light"] .glass:hover {
+            border-color: rgba(16,185,129,0.3);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        [data-theme="light"] .section-title,
+        [data-theme="light"] h1,
+        [data-theme="light"] h2,
+        [data-theme="light"] h3 { color: #0F172A; }
+        [data-theme="light"] .section-subtitle,
+        [data-theme="light"] .hero p,
+        [data-theme="light"] .team-card .bio,
+        [data-theme="light"] .value-card p,
+        [data-theme="light"] .contact-info li,
+        [data-theme="light"] .stat-label,
+        [data-theme="light"] .timeline-item p,
+        [data-theme="light"] .job-item { color: #475569; }
+        [data-theme="light"] .logo-text h1 {
+            background: linear-gradient(90deg, #059669, #0891B2);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        [data-theme="light"] .logo-text p { color: #94A3B8; }
+        [data-theme="light"] .badge {
+            color: #059669; border-color: rgba(0,0,0,0.12);
+            background: rgba(16,185,129,0.06);
+        }
+        [data-theme="light"] .gradient-text {
+            background: linear-gradient(90deg, #059669, #0891B2, #7C3AED);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        [data-theme="light"] .value-icon { background: rgba(16,185,129,0.08); }
+        [data-theme="light"] .job-item { background: rgba(0,0,0,0.02); }
+        [data-theme="light"] .btn-outline { border-color: rgba(0,0,0,0.15); color: #1E293B; }
+        [data-theme="light"] .btn-outline:hover { background: rgba(0,0,0,0.05); }
+        [data-theme="light"] .cc-theme-toggle {
+            color: #94A3B8;
+            border-color: rgba(0,0,0,0.1);
+        }
+        [data-theme="light"] .cc-theme-toggle:hover {
+            background: rgba(16,185,129,0.08);
+            color: #059669;
+            border-color: rgba(16,185,129,0.3);
+        }
+        [data-theme="light"] .bg-orb { opacity: 0.06; }
+        [data-theme="light"] footer { border-top-color: rgba(0,0,0,0.08); color: #94A3B8; }
+        [data-theme="light"] .social-link { border-color: rgba(0,0,0,0.12); color: #94A3B8; }
+        [data-theme="light"] .social-link:hover { background: rgba(16,185,129,0.1); border-color: #10B981; color: #10B981; }
+        [data-theme="light"] .team-card .role { color: #059669; }
+        [data-theme="light"] .timeline-year { background: rgba(16,185,129,0.08); color: #059669; }
+        [data-theme="light"] .job-badge { background: rgba(139,92,246,0.08); color: #7C3AED; }
+        [data-theme="light"] .stat-value {
+            background: linear-gradient(90deg, #059669, #0891B2);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        [data-theme="light"] .timeline-line { background: rgba(0,0,0,0.08); }
+        [data-theme="light"] .mobile-menu-btn { color: #334155; }
+        [data-theme="light"] nav.open { background: rgba(248,250,252,0.98); border-bottom: 1px solid rgba(0,0,0,0.08); }
+    
+        /* Login & Get Started Buttons */
+        .btn-login { display:inline-flex; align-items:center; gap:6px; padding:8px 18px; border-radius:8px; font-size:13px; font-weight:600; border:1px solid rgba(255,255,255,0.2); background:transparent; color:white; cursor:pointer; transition:all 0.2s ease; text-decoration:none; white-space:nowrap; }
+        .btn-login:hover { background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.3); }
+        .btn-get-started { display:inline-flex; align-items:center; gap:6px; padding:8px 18px; border-radius:8px; font-size:13px; font-weight:600; border:none; background:linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); color:white; cursor:pointer; transition:all 0.2s ease; text-decoration:none; white-space:nowrap; box-shadow:0 4px 15px rgba(16,185,129,0.3); }
+        .btn-get-started:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(16,185,129,0.45); }
+        [data-theme="light"] .btn-login { color:#1E293B; border-color:rgba(0,0,0,0.15); }
+        [data-theme="light"] .btn-login:hover { background:rgba(0,0,0,0.04); }
+        /* Modal overlay */
+        .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); z-index:1000; align-items:center; justify-content:center; }
+        .modal-overlay.open { display:flex; }
+        .modal { background:var(--dark-lighter); border:1px solid rgba(255,255,255,0.1); border-radius:20px; padding:2.5rem; width:100%; max-width:420px; margin:1rem; position:relative; animation:modalIn 0.25s ease-out; }
+        @keyframes modalIn { from { opacity:0; transform:translateY(20px) scale(0.97); } to { opacity:1; transform:translateY(0) scale(1); } }
+        [data-theme="light"] .modal { background:#ffffff; border-color:rgba(0,0,0,0.08); box-shadow:0 20px 60px rgba(0,0,0,0.15); }
+        .modal-close { position:absolute; top:16px; right:16px; width:32px; height:32px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:transparent; color:var(--gray-400); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s; }
+        .modal-close:hover { background:rgba(255,255,255,0.08); color:white; }
+        [data-theme="light"] .modal-close { border-color:rgba(0,0,0,0.1); color:#94A3B8; }
+        [data-theme="light"] .modal-close:hover { background:rgba(0,0,0,0.04); color:#1E293B; }
+        .modal h2 { font-size:1.5rem; font-weight:700; margin-bottom:0.5rem; }
+        .modal p { color:var(--gray-400); font-size:14px; margin-bottom:1.5rem; line-height:1.6; }
+        [data-theme="light"] .modal h2 { color:#0F172A; }
+        [data-theme="light"] .modal p { color:#64748B; }
+        .form-group { margin-bottom:1rem; }
+        .form-group label { display:block; font-size:13px; font-weight:500; margin-bottom:6px; color:var(--gray-300); }
+        [data-theme="light"] .form-group label { color:#475569; }
+        .form-group input { width:100%; padding:10px 14px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.05); color:white; font-size:14px; font-family:inherit; outline:none; transition:border-color 0.2s; }
+        .form-group input:focus { border-color:var(--primary); }
+        .form-group input::placeholder { color:var(--gray-500); }
+        [data-theme="light"] .form-group input { background:#F8FAFC; border-color:rgba(0,0,0,0.12); color:#1E293B; }
+        [data-theme="light"] .form-group input:focus { border-color:#059669; }
+        [data-theme="light"] .form-group input::placeholder { color:#94A3B8; }
+        .form-submit { width:100%; padding:12px; border-radius:10px; border:none; background:linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); color:white; font-size:14px; font-weight:600; cursor:pointer; transition:all 0.2s; margin-top:0.5rem; }
+        .form-submit:hover { box-shadow:0 4px 20px rgba(16,185,129,0.4); }
+        .form-submit:disabled { opacity:0.6; cursor:not-allowed; }
+        .form-footer { text-align:center; margin-top:1.25rem; font-size:13px; color:var(--gray-400); }
+        .form-footer a { color:var(--primary); text-decoration:none; font-weight:500; cursor:pointer; }
+        .form-footer a:hover { text-decoration:underline; }
+        [data-theme="light"] .form-footer { color:#94A3B8; }
+        .modal-success { display:none; text-align:center; padding:1rem 0; }
+        .modal-success .check-circle { width:56px; height:56px; border-radius:50%; background:rgba(16,185,129,0.12); color:var(--primary); display:flex; align-items:center; justify-content:center; margin:0 auto 1rem; }
+        .modal-success h3 { font-size:1.25rem; font-weight:700; margin-bottom:0.5rem; }
+        .modal-success p { margin-bottom:1.5rem; }
+        [data-theme="light"] .modal-success h3 { color:#0F172A; }
+        .chart-wrap{position:relative;width:100%}
+    
+        /* ===== NEWS FEED ===== */
+        .news-feed-section{padding:3rem 0}
+        .news-feed-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:1.25rem;margin-top:2rem}
+        .news-card{background:var(--dark-card,#162032);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius,16px);padding:1.5rem;transition:all .3s}
+        .news-card:hover{border-color:rgba(16,185,129,.2);transform:translateY(-2px)}
+        .news-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+        .news-source{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--gray-300,#CBD5E1)}
+        .news-source-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+        .news-card-title{font-size:14px;font-weight:600;color:white;line-height:1.5;margin-bottom:.5rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+        .news-card-desc{font-size:12px;color:var(--gray-400,#94A3B8);line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+        .news-card-footer{display:flex;align-items:center;gap:6px;margin-top:.75rem;font-size:11px;color:var(--primary,#10B981);font-weight:500}
+        .news-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+        .news-badge-breaking{background:rgba(239,68,68,.15);color:#EF4444}
+        .news-badge-regulatory{background:rgba(245,158,11,.15);color:#F59E0B}
+        .news-badge-market{background:rgba(16,185,129,.15);color:#10B981}
+        .news-badge-trade{background:rgba(6,182,212,.15);color:#06B6D4}
+        .news-loading{text-align:center;padding:2rem;color:var(--gray-500,#64748B);font-size:13px}
+        @keyframes spin{to{transform:rotate(360deg)}}
+
+    
+/* ===== UNIFIED SITE FOOTER ===== */
+.site-footer {
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 1) 100%);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 0;
+    margin-top: 3rem;
+    position: relative;
+    overflow: hidden;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+.site-footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.5), rgba(6, 182, 212, 0.5), transparent);
+}
+.sf-glow {
+    position: absolute;
+    width: 400px;
+    height: 200px;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.07;
+    pointer-events: none;
+}
+.sf-glow-1 { top: -80px; left: 10%; background: var(--primary, #10B981); }
+.sf-glow-2 { top: -80px; right: 10%; background: var(--secondary, #06B6D4); }
+.sf-main {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 3rem 2rem 2rem;
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr;
+    gap: 2rem;
+    position: relative;
+    z-index: 1;
+}
+@media (max-width: 1024px) {
+    .sf-main { grid-template-columns: 1fr 1fr 1fr; }
+    .sf-brand-col { grid-column: span 3; margin-bottom: 0.5rem; }
+}
+@media (max-width: 640px) {
+    .sf-main { grid-template-columns: 1fr 1fr; gap: 1.5rem; padding: 2rem 1.25rem 1.5rem; }
+    .sf-brand-col { grid-column: span 2; }
+}
+@media (max-width: 420px) {
+    .sf-main { grid-template-columns: 1fr; }
+    .sf-brand-col { grid-column: span 1; }
+}
+/* Brand column */
+.sf-brand-col {}
+.sf-brand-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1rem;
+    text-decoration: none;
+}
+.sf-brand-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--primary, #10B981), var(--secondary, #06B6D4));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.sf-brand-icon svg { width: 20px; height: 20px; color: white; }
+.sf-brand-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: white;
+    line-height: 1.2;
+}
+.sf-brand-tagline {
+    font-size: 11px;
+    color: rgba(148, 163, 184, 0.8);
+    font-weight: 400;
+}
+.sf-about-text {
+    font-size: 13px;
+    line-height: 1.65;
+    color: rgba(148, 163, 184, 0.9);
+    margin-bottom: 1.25rem;
+    max-width: 320px;
+}
+.sf-socials {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.sf-social-link {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+    text-decoration: none;
+}
+.sf-social-link:hover {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: rgba(16, 185, 129, 0.4);
+    transform: translateY(-2px);
+}
+.sf-social-link svg { width: 16px; height: 16px; color: rgba(148, 163, 184, 0.8); transition: color 0.25s; }
+.sf-social-link:hover svg { color: #10B981; }
+/* Link columns */
+.sf-col-heading {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 1rem;
+}
+.sf-links { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+.sf-links li { margin: 0; }
+.sf-links a {
+    font-size: 13px;
+    color: rgba(148, 163, 184, 0.85);
+    text-decoration: none;
+    transition: color 0.2s, padding-left 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.sf-links a:hover {
+    color: #10B981;
+    padding-left: 3px;
+}
+.sf-links a svg {
+    width: 14px;
+    height: 14px;
+    opacity: 0.6;
+    flex-shrink: 0;
+}
+.sf-links a:hover svg { opacity: 1; }
+/* Contact column specifics */
+.sf-contact-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 0.65rem;
+    font-size: 13px;
+    color: rgba(148, 163, 184, 0.85);
+    line-height: 1.5;
+}
+.sf-contact-item svg {
+    width: 15px;
+    height: 15px;
+    color: rgba(16, 185, 129, 0.7);
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+.sf-contact-item a {
+    color: rgba(148, 163, 184, 0.85);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.sf-contact-item a:hover { color: #10B981; }
+/* Bottom bar */
+.sf-bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 1.25rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    position: relative;
+    z-index: 1;
+}
+.sf-bottom-left {
+    font-size: 12px;
+    color: rgba(100, 116, 139, 0.8);
+}
+.sf-bottom-left a {
+    color: rgba(148, 163, 184, 0.7);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.sf-bottom-left a:hover { color: #10B981; }
+.sf-bottom-right {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+}
+.sf-bottom-right a {
+    font-size: 12px;
+    color: rgba(100, 116, 139, 0.8);
+    text-decoration: none;
+    transition: color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+.sf-bottom-right a:hover { color: #10B981; }
+.sf-gdpr-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 6px;
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(16, 185, 129, 0.9);
+}
+.sf-gdpr-badge svg { width: 12px; height: 12px; }
+@media (max-width: 640px) {
+    .sf-bottom { flex-direction: column; align-items: flex-start; padding: 1rem 1.25rem; }
+    .sf-bottom-right { gap: 0.75rem; }
+}
+</style>
+</head>
+<body>
+    <div class="bg-animation"><div class="bg-orb bg-orb-1"></div><div class="bg-orb bg-orb-2"></div><div class="bg-orb bg-orb-3"></div></div>
+
+    <header>
+        <div class="header-content">
+            <a href="./index.html" class="logo-section">
+                <div class="logo-icon"><i data-lucide="brain" style="width:24px;height:24px;color:white;"></i></div>
+                <div class="logo-text"><h1>AI Supply Chain</h1><p>Advanced Platform</p></div>
+            </a>
+            <button class="mobile-menu-btn" onclick="document.querySelector('nav').classList.toggle('open')"><i data-lucide="menu" style="width:24px;height:24px;"></i></button>
+            <nav>
+                <a href="./index.html">Home</a>
+                <a href="./about.html">About</a>
+                <a href="./spa/">Command Center ⭐</a>
+                <a href="./operations.html">Operations Hub</a>
+                <a href="./dashboard.html">Dashboard</a>
+                <a href="./intelligence.html" class="active">Intelligence</a>
+                <a href="./platform.html">Platform</a>
+                <a href="./product.html">Product</a>
+                <a href="./customers.html">Customers</a>
+                <a href="./industries.html">Industries</a>
+                <a href="./events.html">Events</a>
+                <a href="./pricing.html">Pricing</a>
+                <a href="./support.html">Support</a>
+            </nav>
+            <div class="header-actions" style="display:flex;align-items:center;gap:12px;">
+                                                    <button class="btn-login" onclick="openModal('login')"><i data-lucide="log-in" style="width:14px;height:14px;"></i> Login</button>
+                        <button class="btn-get-started" onclick="openModal('getstarted')"><i data-lucide="rocket" style="width:14px;height:14px;"></i> Get Started</button>
+<button class="cc-theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg></button>
+            <a href="./spa/" class="btn btn-primary" style="padding:8px 16px;font-size:13px;">Launch App</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Navigation Buttons -->
+        <div class="page-nav-buttons" style="max-width:1200px;margin:2rem auto;padding:0 2rem;">
+            <button onclick="window.history.back()" class="btn btn-secondary btn-sm" data-tooltip="Go Back">
+                <i data-lucide="arrow-left" style="width:16px;"></i> Back
+            </button>
+            <a href="./index.html" class="btn btn-primary btn-sm" data-tooltip="Home">
+                <i data-lucide="home" style="width:16px;"></i> Home
+            </a>
+        </div>
+
+        <!-- Hero -->
+        <section class="hero">
+            <div class="badge"><i data-lucide="sparkles" style="width:16px;height:16px;"></i> AI/ML Engine</div>
+            <h1>Explainable <span class="gradient-text">Artificial Intelligence</span></h1>
+            <p>Transparent AI decisions you can trust. Every prediction explained with full SHAP attribution.</p>
+            <div class="tech-badges">
+                <span class="tech-badge">PyTorch</span>
+                <span class="tech-badge">TensorFlow</span>
+                <span class="tech-badge">SHAP</span>
+                <span class="tech-badge">LIME</span>
+                <span class="tech-badge">Transformers</span>
+            </div>
+        </section>
+
+        <!-- AI Capabilities -->
+        <section id="capabilities">
+            <h2 class="section-title">AI Capabilities</h2>
+            
+            <div class="capabilities-grid">
+                <div class="glass cap-card">
+                    <div class="cap-icon" style="color:var(--primary)"><i data-lucide="brain" style="width:24px;height:24px;"></i></div>
+                    <h3>Predictive Analytics</h3>
+                    <p>Forecast disruptions before they occur using ensemble ML models trained on global supply chain data.</p>
+                    <div class="cap-stats">
+                        <div><div class="cap-accuracy">94.2%</div><div style="font-size:12px;color:var(--gray-500);">Accuracy</div></div>
+                        <span class="cap-trend">+2.1%</span>
+                    </div>
+                </div>
+                
+                <div class="glass cap-card">
+                    <div class="cap-icon" style="color:var(--warning)"><i data-lucide="target" style="width:24px;height:24px;"></i></div>
+                    <h3>Risk Scoring</h3>
+                    <p>Multi-dimensional risk assessment with real-time updates across financial, operational, and geopolitical factors.</p>
+                    <div class="cap-stats">
+                        <div><div class="cap-accuracy">91.8%</div><div style="font-size:12px;color:var(--gray-500);">Accuracy</div></div>
+                        <span class="cap-trend">+3.4%</span>
+                    </div>
+                </div>
+                
+                <div class="glass cap-card">
+                    <div class="cap-icon" style="color:#eab308"><i data-lucide="lightbulb" style="width:24px;height:24px;"></i></div>
+                    <h3>Anomaly Detection</h3>
+                    <p>Identify unusual patterns across supply chain data streams using advanced unsupervised learning.</p>
+                    <div class="cap-stats">
+                        <div><div class="cap-accuracy">89.5%</div><div style="font-size:12px;color:var(--gray-500);">Accuracy</div></div>
+                        <span class="cap-trend">+5.2%</span>
+                    </div>
+                </div>
+                
+                <div class="glass cap-card">
+                    <div class="cap-icon" style="color:var(--accent)"><i data-lucide="trending-up" style="width:24px;height:24px;"></i></div>
+                    <h3>Demand Forecasting</h3>
+                    <p>AI-powered demand prediction with confidence intervals and scenario modeling capabilities.</p>
+                    <div class="cap-stats">
+                        <div><div class="cap-accuracy">92.7%</div><div style="font-size:12px;color:var(--gray-500);">Accuracy</div></div>
+                        <span class="cap-trend">+1.8%</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SHAP Explanation -->
+        <section id="shap">
+            <h2 class="section-title">SHAP Feature Attribution</h2>
+            <p class="section-subtitle">See exactly which factors drive each risk prediction. Full transparency, no black boxes.</p>
+            
+            <div class="shap-grid">
+                <div class="glass">
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:1.5rem;">
+                        <i data-lucide="brain" style="width:22px;height:22px;color:var(--accent);"></i>
+                        <h3 style="font-size:1.125rem;font-weight:600;">Risk Prediction Breakdown</h3>
+                    </div>
+                    <p style="font-size:14px;color:var(--gray-400);margin-bottom:1.5rem;line-height:1.6;">Selected Supplier: <strong style="color:white;">TechComp Asia</strong></p>
+                    
+                    <div class="shap-item">
+                        <div class="shap-header"><span>Financial Health</span><span class="shap-value positive">+35%</span></div>
+                        <div class="shap-bar-bg"><div class="shap-bar-fill" style="width:35%;background:#f43f5e;"></div></div>
+                    </div>
+                    <div class="shap-item">
+                        <div class="shap-header"><span>Geopolitical Risk</span><span class="shap-value positive">+28%</span></div>
+                        <div class="shap-bar-bg"><div class="shap-bar-fill" style="width:28%;background:#f97316;"></div></div>
+                    </div>
+                    <div class="shap-item">
+                        <div class="shap-header"><span>Operational Metrics</span><span class="shap-value positive">+22%</span></div>
+                        <div class="shap-bar-bg"><div class="shap-bar-fill" style="width:22%;background:#f59e0b;"></div></div>
+                    </div>
+                    <div class="shap-item">
+                        <div class="shap-header"><span>Environmental Factors</span><span class="shap-value positive">+15%</span></div>
+                        <div class="shap-bar-bg"><div class="shap-bar-fill" style="width:15%;background:#10b981;"></div></div>
+                    </div>
+                    <div class="shap-item">
+                        <div class="shap-header"><span>Compliance History</span><span class="shap-value negative">-8%</span></div>
+                        <div class="shap-bar-bg"><div class="shap-bar-fill" style="width:8%;background:#06b6d4;margin-left:auto;"></div></div>
+                    </div>
+                    <div class="shap-item">
+                        <div class="shap-header"><span>Supplier Relationship</span><span class="shap-value negative">-5%</span></div>
+                        <div class="shap-bar-bg"><div class="shap-bar-fill" style="width:5%;background:#8b5cf6;margin-left:auto;"></div></div>
+                    </div>
+                    
+                    <div class="prediction-box">
+                        <span class="prediction-label">Predicted Risk Probability</span>
+                        <span class="prediction-value">78.4%</span>
+                    </div>
+                </div>
+                
+                <div class="glass">
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:1.5rem;">
+                        <i data-lucide="trending-up" style="width:22px;height:22px;color:var(--success);"></i>
+                        <h3 style="font-size:1.125rem;font-weight:600;">Model Accuracy Over Time</h3>
+                    </div>
+                    <div class="chart-container"><div class="chart-wrap" style="height:260px"><canvas id="modelChart"></canvas></div></div>
+                    <div style="display:flex;justify-content:center;gap:24px;margin-top:1rem;font-size:13px;">
+                        <span style="display:flex;align-items:center;gap:6px;"><span style="width:12px;height:12px;border-radius:50%;background:#10b981;display:inline-block;"></span> Actual Accuracy</span>
+                        <span style="display:flex;align-items:center;gap:6px;"><span style="width:12px;height:12px;border-radius:50%;background:#8b5cf6;display:inline-block;"></span> Predicted Accuracy</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Model Performance -->
+        <section id="performance" style="background:rgba(255,255,255,0.02);border-radius:24px;padding:4rem 2rem;margin:4rem 0;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;">
+                <div>
+                    <h2 class="section-title" style="text-align:left;">Model Performance Profile</h2>
+                    <p style="color:var(--gray-400);line-height:1.7;margin-bottom:2rem;">Our AI models are optimized for enterprise supply chain use cases, balancing accuracy, speed, and explainability.</p>
+                    
+                    <div class="model-stats">
+                        <div class="stat-item"><span>Training Data Volume</span><span class="stat-badge">10M+ records</span></div>
+                        <div class="stat-item"><span>Model Update Frequency</span><span class="stat-badge">Real-time</span></div>
+                        <div class="stat-item"><span>Inference Latency</span><span class="stat-badge">&lt; 50ms</span></div>
+                        <div class="stat-item"><span>Feature Dimensions</span><span class="stat-badge">250+ factors</span></div>
+                    </div>
+                </div>
+                
+                <div class="glass" style="padding:1.5rem;">
+                    <div class="chart-container" style="height:320px;"><canvas id="radarChart"></canvas></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI Agents -->
+        <section id="agents">
+            <h2 class="section-title">AI Agent Capabilities</h2>
+            <p class="section-subtitle">Autonomous agents that monitor, analyze, and act on your supply chain in real-time.</p>
+            
+            <div class="agents-grid">
+                <div class="glass agent-card">
+                    <div class="agent-icon" style="background:linear-gradient(135deg,rgba(244,63,94,0.15),rgba(249,115,22,0.15));color:#f43f5e;">
+                        <i data-lucide="activity" style="width:28px;height:28px;"></i>
+                    </div>
+                    <h3>Monitoring Agent</h3>
+                    <p>Continuously scans all data sources for anomalies and emerging risks across your supply network.</p>
+                    <ul class="agent-list">
+                        <li><i data-lucide="check-circle-2"></i> 24/7 surveillance</li>
+                        <li><i data-lucide="check-circle-2"></i> Pattern recognition</li>
+                        <li><i data-lucide="check-circle-2"></i> Auto-alerting</li>
+                    </ul>
+                </div>
+                
+                <div class="glass agent-card">
+                    <div class="agent-icon" style="background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(6,182,212,0.15));color:#3b82f6;">
+                        <i data-lucide="zap" style="width:28px;height:28px;"></i>
+                    </div>
+                    <h3>Analysis Agent</h3>
+                    <p>Deep-dive analysis when risks are detected, providing context and actionable recommendations.</p>
+                    <ul class="agent-list">
+                        <li><i data-lucide="check-circle-2"></i> Root cause analysis</li>
+                        <li><i data-lucide="check-circle-2"></i> Impact assessment</li>
+                        <li><i data-lucide="check-circle-2"></i> Mitigation options</li>
+                    </ul>
+                </div>
+                
+                <div class="glass agent-card">
+                    <div class="agent-icon" style="background:linear-gradient(135deg,rgba(16,185,129,0.15),rgba(34,197,94,0.15));color:#10b981;">
+                        <i data-lucide="shield" style="width:28px;height:28px;"></i>
+                    </div>
+                    <h3>Compliance Agent</h3>
+                    <p>Tracks regulatory requirements and flags potential compliance gaps before they become issues.</p>
+                    <ul class="agent-list">
+                        <li><i data-lucide="check-circle-2"></i> Regulatory tracking</li>
+                        <li><i data-lucide="check-circle-2"></i> Gap analysis</li>
+                        <li><i data-lucide="check-circle-2"></i> Audit support</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        
+        <!-- LIVE INTELLIGENCE FEED -->
+        <section class="news-feed-section"><div class="container">
+            <div class="section-badge"><i data-lucide="rss" style="width:13px;height:13px"></i> Live Intelligence Feed</div>
+            <h2 class="section-title">AI-Powered <span class="gradient-text">Market Intelligence</span></h2>
+            <p class="section-desc">Breaking news enriched with AI risk scoring. Every headline analysed for supply chain impact.</p>
+            <div class="news-feed-grid" id="intelligence-news-grid">
+                <div class="news-loading"><i data-lucide="loader" style="width:18px;height:18px"></i> Loading live feeds...</div>
+            </div>
+        </div></section>
+<!-- CTA -->
+        <section class="cta-section">
+            <div class="cta-card glass">
+                <div class="cta-icon"><i data-lucide="sparkles" style="width:64px;height:64px;"></i></div>
+                <h2>Experience AI-Powered Intelligence</h2>
+                <p>See how explainable AI can transform your supply chain risk management with full transparency and actionable insights.</p>
+                <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:1rem;">
+                                <button class="cc-theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg></button>
+            <a href="./spa/" class="btn btn-primary">Try AI Demo <i data-lucide="play" style="width:18px;height:18px;"></i></a>
+                    <a href="./support.html" class="btn btn-outline">View Documentation <i data-lucide="arrow-right" style="width:18px;height:18px;"></i></a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    
+    <!-- Login Modal -->
+    <div class="modal-overlay" id="modal-login" onclick="if(event.target===this)closeModal('login')">
+        <div class="modal">
+            <button class="modal-close" onclick="closeModal('login')"><i data-lucide="x" style="width:16px;height:16px;"></i></button>
+            <div id="login-form-view">
+                <h2>Welcome Back</h2>
+                <p>Sign in to access your AI Supply Chain dashboard and intelligence tools.</p>
+                <form onsubmit="handleLogin(event)">
+                    <div class="form-group"><label>Email</label><input type="email" placeholder="you@company.com" required id="login-email"></div>
+                    <div class="form-group"><label>Password</label><input type="password" placeholder="Enter your password" required id="login-password" minlength="6"></div>
+                    <button type="submit" class="form-submit">Sign In</button>
+                </form>
+                <div class="form-footer">Don't have an account? <a onclick="closeModal('login');openModal('getstarted')">Get Started</a></div>
+            </div>
+            <div class="modal-success" id="login-success">
+                <div class="check-circle"><i data-lucide="check" style="width:28px;height:28px;"></i></div>
+                <h3>Login Successful</h3>
+                <p>Welcome back! Redirecting to your Command Center...</p>
+                <button class="form-submit" onclick="window.location.href='./spa/'">Go to Command Center</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Get Started Modal -->
+    <div class="modal-overlay" id="modal-getstarted" onclick="if(event.target===this)closeModal('getstarted')">
+        <div class="modal">
+            <button class="modal-close" onclick="closeModal('getstarted')"><i data-lucide="x" style="width:16px;height:16px;"></i></button>
+            <div id="getstarted-form-view">
+                <h2>Get Started Free</h2>
+                <p>Create your account and start exploring AI-powered supply chain intelligence in minutes.</p>
+                <form onsubmit="handleGetStarted(event)">
+                    <div class="form-group"><label>Full Name</label><input type="text" placeholder="John Smith" required id="gs-name"></div>
+                    <div class="form-group"><label>Work Email</label><input type="email" placeholder="you@company.com" required id="gs-email"></div>
+                    <div class="form-group"><label>Company</label><input type="text" placeholder="Company name" required id="gs-company"></div>
+                    <div class="form-group"><label>Password</label><input type="password" placeholder="Min. 8 characters" required id="gs-password" minlength="8"></div>
+                    <button type="submit" class="form-submit">Create Account</button>
+                </form>
+                <div class="form-footer">Already have an account? <a onclick="closeModal('getstarted');openModal('login')">Sign In</a></div>
+            </div>
+            <div class="modal-success" id="getstarted-success">
+                <div class="check-circle"><i data-lucide="check" style="width:28px;height:28px;"></i></div>
+                <h3>Account Created!</h3>
+                <p>Your free trial is ready. Launching the Command Center...</p>
+                <button class="form-submit" onclick="window.location.href='./spa/'">Launch Command Center</button>
+            </div>
+        </div>
+    </div>
+<footer class="site-footer">
+    <div class="sf-glow sf-glow-1"></div>
+    <div class="sf-glow sf-glow-2"></div>
+    <div class="sf-main">
+        <!-- Brand + About + Social -->
+        <div class="sf-brand-col">
+            <a href="./index.html" class="sf-brand-logo">
+                <div class="sf-brand-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+                </div>
+                <div>
+                    <div class="sf-brand-name">AI Supply Chain Advanced</div>
+                    <div class="sf-brand-tagline">Enterprise Intelligence Platform</div>
+                </div>
+            </a>
+            <p class="sf-about-text">Empowering global enterprises with AI-driven supply chain intelligence, real-time risk monitoring, regulatory compliance automation, and predictive analytics across every industry vertical.</p>
+            <div class="sf-socials">
+                <a href="https://www.linkedin.com/company/aisupplychain-advanced" target="_blank" rel="noopener noreferrer" class="sf-social-link" aria-label="LinkedIn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                </a>
+                <a href="https://x.com/AISupChnAdvanced" target="_blank" rel="noopener noreferrer" class="sf-social-link" aria-label="X (Twitter)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                </a>
+                <a href="https://www.facebook.com/AISupplyChainAdvanced" target="_blank" rel="noopener noreferrer" class="sf-social-link" aria-label="Facebook">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                </a>
+                <a href="https://www.instagram.com/aisupplychain.advanced" target="_blank" rel="noopener noreferrer" class="sf-social-link" aria-label="Instagram">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+                </a>
+                <a href="https://github.com/testdemoqwenai2025-creator/Demo9AISupChn" target="_blank" rel="noopener noreferrer" class="sf-social-link" aria-label="GitHub">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                </a>
+            </div>
+        </div>
+        <!-- Platform -->
+        <div>
+            <div class="sf-col-heading">Platform</div>
+            <ul class="sf-links">
+                <li><a href="./dashboard.html"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>Dashboard</a></li>
+                <li><a href="./intelligence.html"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h5"/><path d="M17 12h5"/><path d="m12 2 1.09 3.26L12 8.53l-1.09-3.27L12 2Z"/><path d="m12 15.47 1.09 3.27L12 22l-1.09-3.26 1.09-3.27Z"/><path d="m2 12 3.26-1.09L8.53 12l-3.27 1.09L2 12Z"/><path d="m15.47 12 3.27 1.09L22 12l-3.26-1.09-3.27 1.09Z"/><circle cx="12" cy="12" r="4"/></svg>Intelligence</a></li>
+                <li><a href="./platform.html"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>Architecture</a></li>
+                <li><a href="./product.html"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>Products</a></li>
+                <li><a href="./spa/"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>Command Center</a></li>
+                <li><a href="./pricing.html"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg>Pricing</a></li>
+            </ul>
+        </div>
+        <!-- Company -->
+        <div>
+            <div class="sf-col-heading">Company</div>
+            <ul class="sf-links">
+                <li><a href="./about.html"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>About Us</a></li>
+                <li><a href="./customers.html"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Customers</a></li>
+                <li><a href="./industries.html"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M17 18h1"/><path d="M12 18h1"/><path d="M7 18h1"/></svg>Industries</a></li>
+                <li><a href="./events.html"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Events</a></li>
+                <li><a href="./support.html"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Support</a></li>
+            </ul>
+        </div>
+        <!-- Legal -->
+        <div>
+            <div class="sf-col-heading">Legal & Compliance</div>
+            <ul class="sf-links">
+                <li><a href="#" onclick="return false;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>Privacy Policy</a></li>
+                <li><a href="#" onclick="return false;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>Terms of Service</a></li>
+                <li><a href="#" onclick="return false;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>Cookie Policy</a></li>
+                <li><a href="#" onclick="return false;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>GDPR Compliance</a></li>
+                <li><a href="#" onclick="return false;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="m10 13-2 2 2 2"/><path d="m14 17 2-2-2-2"/></svg>Data Processing</a></li>
+            </ul>
+        </div>
+        <!-- Contact -->
+        <div>
+            <div class="sf-col-heading">Contact</div>
+            <div class="sf-contact-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                <a href="mailto:testdemoqwenai2025@gmail.com">testdemoqwenai2025@gmail.com</a>
+            </div>
+            <div class="sf-contact-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                <span>+44 (0) 20 7946 0958</span>
+            </div>
+            <div class="sf-contact-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span>71-75 Shelton Street, Covent Garden, London, WC2H 9JQ, United Kingdom</span>
+            </div>
+            <div class="sf-contact-item" style="margin-top: 0.75rem;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                <a href="https://testdemoqwenai2025-creator.github.io/Demo9AISupChn/" target="_blank" rel="noopener noreferrer">Live Demo Preview</a>
+            </div>
+        </div>
+    </div>
+    <!-- Bottom Bar -->
+    <div class="sf-bottom">
+        <div class="sf-bottom-left">
+            &copy; 2026 AI Supply Chain Advanced. All rights reserved. Built with precision in London, United Kingdom.
+        </div>
+        <div class="sf-bottom-right">
+            <span class="sf-gdpr-badge">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+                GDPR Compliant
+            </span>
+            <a href="#" onclick="return false;">Accessibility</a>
+            <a href="#" onclick="return false;">Sitemap</a>
+            <a href="https://github.com/testdemoqwenai2025-creator/Demo9AISupChn" target="_blank" rel="noopener noreferrer">Repository</a>
+        </div>
+    </div>
+</footer>
+
+    <script>    lucide.createIcons();
+
+
+    // Modal functions
+    function openModal(type) {
+        document.getElementById('modal-' + type).classList.add('open');
+        document.body.style.overflow = 'hidden';
+        var formView = document.getElementById(type + '-form-view');
+        var successView = document.getElementById(type + '-success');
+        if (formView) formView.style.display = 'block';
+        if (successView) successView.style.display = 'none';
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+    function closeModal(type) {
+        document.getElementById('modal-' + type).classList.remove('open');
+        document.body.style.overflow = '';
+    }
+    function handleLogin(e) {
+        e.preventDefault();
+        var btn = e.target.querySelector('.form-submit');
+        btn.disabled = true; btn.textContent = 'Signing in...';
+        setTimeout(function() {
+            document.getElementById('login-form-view').style.display = 'none';
+            document.getElementById('login-success').style.display = 'block';
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }, 1200);
+    }
+    function handleGetStarted(e) {
+        e.preventDefault();
+        var btn = e.target.querySelector('.form-submit');
+        btn.disabled = true; btn.textContent = 'Creating account...';
+        setTimeout(function() {
+            document.getElementById('getstarted-form-view').style.display = 'none';
+            document.getElementById('getstarted-success').style.display = 'block';
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }, 1500);
+    }
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') { closeModal('login'); closeModal('getstarted'); }
+    });
+
+    function toggleTheme() {
+        var current = document.documentElement.getAttribute('data-theme');
+        var next = current === 'light' ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+        document.querySelectorAll('.cc-theme-toggle').forEach(function(btn) {
+            btn.innerHTML = next === 'dark' ? '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>' : '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg>';
+        });
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        var saved = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', saved);
+        document.querySelectorAll('.cc-theme-toggle').forEach(function(btn) {
+            btn.innerHTML = saved === 'dark' ? '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>' : '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg>';
+        });
+    });
+        // ===== NEWS FEEDS =====
+        var newsConfig={
+          rss2json:"https://api.rss2json.com/v1/api.json?rss_url=",
+          feeds:[
+            {name:"Reuters Supply Chain",url:"https://feeds.reuters.com/reuters/businessNews",color:"#F59E0B",badge:"trade"},
+            {name:"Yahoo Finance Markets",url:"https://finance.yahoo.com/news/rssindex",color:"#10B981",badge:"market"},
+            {name:"AP Business News",url:"https://rss.apnews.com/feed/business",color:"#EF4444",badge:"breaking"}
+          ],
+          fallback:[
+            {source:"Reuters",title:"Global Shipping Rates Surge 12% as Red Sea Diversions Persist Through Q3",desc:"Container freight rates on Asia-Europe routes continue elevated as carriers maintain longer Cape of Good Hope routing.",badge:"trade",time:"2h ago",color:"#06B6D4"},
+            {source:"Yahoo Finance",title:"Baltic Dry Index Climbs to 18-Month High on Strong Iron Ore Demand",desc:"The benchmark shipping index rose 3.2% this week, driven by Chinese steel mill restocking and Brazilian iron ore exports.",badge:"market",time:"4h ago",color:"#10B981"},
+            {source:"AP News",title:"EU Commission Announces Expanded EUDR Enforcement Guidelines Effective October 2026",desc:"New clarification on due diligence requirements for coffee, cocoa, and palm oil supply chains affecting 12,000+ EU importers.",badge:"regulatory",time:"5h ago",color:"#F59E0B"},
+            {source:"Reuters",title:"Semiconductor Supply Chain Reshuffling Accelerates: $380B in New Fab Announcements",desc:"Major chipmakers including TSMC and Intel announce expanded capacity in US, Japan, and Europe amid geopolitical pressures.",badge:"trade",time:"6h ago",color:"#06B6D4"},
+            {source:"Yahoo Finance",title:"Oil Prices Steady as OPEC+ Maintains Production Cuts; Supply Chain Impact Mixed",desc:"Brent crude holds near $82/barrel as the cartel extends output restrictions through Q4, affecting logistics cost forecasts.",badge:"market",time:"8h ago",color:"#10B981"},
+            {source:"AP News",title:"US CBP Expands UFLPA Enforcement Scope to Additional Southeast Asian Suppliers",desc:"Customs and Border Protection adds 15 new entities to the Uyghur Forced Labor Prevention Act enforcement list.",badge:"breaking",time:"10h ago",color:"#EF4444"}
+          ]
+        };
+        function renderNewsCard(item){var badgeClass="news-badge-"+item.badge;return '<div class="news-card"><div class="news-card-header"><div class="news-source"><span class="news-source-dot" style="background:'+item.color+'"/><span>'+item.source+'</span></div><span class="news-badge '+badgeClass+'">'+item.badge+'</span></div><div class="news-card-title">'+item.title+'</div><div class="news-card-desc">'+item.desc+'</div><div class="news-card-footer"><i data-lucide="clock" style="width:12px;height:12px"></i> '+item.time+'</div></div>'}
+        function initNewsFeed(containerId,maxCards){var container=document.getElementById(containerId);if(!container)return;var items=newsConfig.fallback.slice(0,maxCards||6);container.innerHTML=items.map(renderNewsCard).join("");lucide.createIcons();newsConfig.feeds.forEach(function(feed,idx){fetch(newsConfig.rss2json+encodeURIComponent(feed.url)).then(function(r){return r.json()}).then(function(data){if(data.status==="ok"&&data.items&&data.items.length>0){var start=idx*2;for(var i=0;i<2&&start+i<items.length;i++){var a=data.items[i];var existing=container.children[start+i];if(existing){existing.querySelector(".news-card-title").textContent=a.title||items[start+i].title;var desc=existing.querySelector(".news-card-desc");if(desc&&a.description)desc.textContent=a.description.replace(/<[^>]*>/g,"").substring(0,180);existing.querySelector(".news-source").innerHTML='<span class="news-source-dot" style="background:'+feed.color+'"/><span>'+feed.name+'</span>';existing.querySelector(".news-badge").textContent=feed.badge;existing.querySelector(".news-badge").className="news-badge news-badge-"+feed.badge}}lucide.createIcons()}}).catch(function(){})})}
+
+        initNewsFeed("intelligence-news-grid",6);
+    </script>
+<script src="/Demo9AISupChn/js/banners.js" defer></script>
+</body>
+</html>
