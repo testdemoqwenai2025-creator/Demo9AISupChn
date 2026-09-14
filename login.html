@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Supply Chain Command Center | Enterprise Platform</title>
+  <meta name="description" content="Global supply chain operations, tender management & AI automation hub.">
+  <link rel="icon" href="https://z-cdn.chatglm.cn/z-ai/static/logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --background: #0a0e1a;
+      --foreground: #ffffff;
+      --primary: #10b981;
+      --accent: #06b6d4;
+      --muted-foreground: #94a3b8;
+      --border: rgba(255, 255, 255, 0.08);
+      --card: rgba(30, 41, 59, 0.5);
+    }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--background);
+      color: var(--foreground);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      position: relative;
+      overflow: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 10%; right: 5%;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      animation: float 12s ease-in-out infinite;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: 10%; left: 5%;
+      width: 350px; height: 350px;
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.12) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      animation: float 15s ease-in-out infinite reverse;
+    }
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(30px, -20px) scale(1.05); }
+    }
+    .login-container {
+      position: relative;
+      width: 100%;
+      max-width: 28rem;
+      z-index: 1;
+    }
+    .logo-section {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .logo-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 64px; height: 64px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #10b981, #06b6d4);
+      margin-bottom: 1rem;
+      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
+    }
+    .logo-icon svg {
+      width: 32px; height: 32px;
+      color: white;
+    }
+    .logo-title {
+      font-size: 24px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #10b981, #06b6d4);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+    }
+    .logo-subtitle {
+      font-size: 14px;
+      color: var(--muted-foreground);
+      margin-top: 4px;
+    }
+    .login-card {
+      background: rgba(30, 41, 59, 0.5);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+    .login-card h2 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: white;
+    }
+    .login-card .subtitle {
+      font-size: 12px;
+      color: var(--muted-foreground);
+      margin-bottom: 24px;
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted-foreground);
+      margin-bottom: 6px;
+    }
+    .form-input-wrapper {
+      position: relative;
+    }
+    .form-input-wrapper svg {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px; height: 16px;
+      color: var(--muted-foreground);
+    }
+    .form-input {
+      width: 100%;
+      padding: 10px 12px 10px 40px;
+      font-size: 14px;
+      background: rgba(148, 163, 184, 0.1);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: white;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+    .form-input:focus {
+      outline: none;
+      border-color: rgba(16, 185, 129, 0.5);
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+    .submit-btn {
+      width: 100%;
+      padding: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      background: linear-gradient(135deg, #059669, #0891b2);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+      margin-top: 8px;
+    }
+    .submit-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+    }
+    .demo-notice {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+    .demo-notice p {
+      font-size: 10px;
+      color: var(--muted-foreground);
+    }
+    .back-home {
+      display: block;
+      text-align: center;
+      margin-top: 24px;
+      font-size: 12px;
+      color: var(--muted-foreground);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .back-home:hover {
+      color: white;
+    }
+    .auto-login-notice {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #34d399;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      z-index: 100;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="auto-login-notice" id="notice">✓ Auto-login with demo credentials...</div>
+  
+  <div class="login-container">
+    <div class="logo-section">
+      <div class="logo-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>
+        </svg>
+      </div>
+      <h1 class="logo-title">AI Supply Chain</h1>
+      <p class="logo-subtitle">Enterprise Command Center</p>
+    </div>
+    
+    <div class="login-card">
+      <h2>Welcome back</h2>
+      <p class="subtitle">Sign in to access the command center</p>
+      
+      <form id="login-form">
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <div class="form-input-wrapper">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/>
+              <rect x="2" y="4" width="20" height="16" rx="2"/>
+            </svg>
+            <input type="email" class="form-input" placeholder="you@company.com" value="demo@aisupplychain.com" id="email" readonly>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <div class="form-input-wrapper">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            <input type="password" class="form-input" placeholder="••••••••" value="demo" id="password" readonly>
+          </div>
+        </div>
+        
+        <button type="submit" class="submit-btn">
+          Sign In
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14"/>
+            <path d="m12 5 7 7-7 7"/>
+          </svg>
+        </button>
+      </form>
+      
+      <div class="demo-notice">
+        <p>Demo mode — auto-login with demo@aisupplychain.com / demo</p>
+      </div>
+    </div>
+    
+    <a href="/Demo9AISupChn/" class="back-home">← Back to home</a>
+  </div>
+  
+  <script>
+    // Auto-login: set localStorage + redirect to command-center
+    (function() {
+      var user = {
+        email: 'demo@aisupplychain.com',
+        name: 'Demo User',
+        role: 'admin'
+      };
+      try {
+        localStorage.setItem('cc-auth-user', JSON.stringify(user));
+      } catch(e) {}
+      
+      setTimeout(function() {
+        window.location.href = '/Demo9AISupChn/spa/command-center';
+      }, 1500);
+    })();
+  </script>
+</body>
+</html>
