@@ -1,0 +1,224 @@
+name: Sync to Demo9AISupChn
+
+# ====================================================================
+# Guardrail workflow — runs on every push to main on AISupChn9-Advance.
+# Mirrors the working tree (excluding dev-only files) into Demo9AISupChn
+# (public client preview repo), and rewrites all Demo9AISupChn path
+# references to Demo9AISupChn so the SPA works at the new Pages URL.
+# The push to Demo9AISupChn then triggers its own validate-pages.yml
+# workflow, which publishes its Pages site.
+# ====================================================================
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-to-public
+  cancel-in-progress: false
+
+jobs:
+  sync-public:
+    name: Mirror AISupChn9-Advance → Demo9AISupChn
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout private repo (source)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Checkout public repo (target)
+        uses: actions/checkout@v4
+        with:
+          repository: testdemoqwenai2025-creator/Demo9AISupChn
+          token: ${{ secrets.MIRROR_TOKEN }}
+          path: public-repo
+          fetch-depth: 0
+
+      - name: Sync demo-only files + rewrite paths
+        env:
+          WORKSPACE: ${{ github.workspace }}
+        run: |
+          set -euo pipefail
+          SRC="$WORKSPACE"
+          DST="$WORKSPACE/public-repo"
+
+          echo "=== Source: $SRC ==="
+          echo "=== Target: $DST ==="
+
+          # Defensive cleanup of nested stray from previous runs.
+          rm -rf "$DST/public-repo"
+
+          # ====================================================================
+          # DEV / DEMO SPLIT
+          # Private repo (AISupChn9-Advance) = full dev workspace with all code.
+          # Public repo (Demo9AISupChn) = demo-only mirror for client preview.
+          # Excludes: src/, prisma/, scripts/, tests/, db/, dev-scripts/,
+          # examples/, tool-results/, download/, node_modules/, .next/, out/,
+          # all config files, all .md/.py/.tsx/.ts/.sh files, worklog, etc.
+          # Keeps: *.html, cc-app/, js/, css/, assets/, .nojekyll, .github/
+          # ====================================================================
+
+          # Phase 1: purge dev-only files/dirs from the target.
+          rm -rf "$DST/dev-scripts" \
+                 "$DST/docs" \
+                 "$DST/src" \
+                 "$DST/prisma" \
+                 "$DST/scripts" \
+                 "$DST/tests" \
+                 "$DST/db" \
+                 "$DST/mini-services" \
+                 "$DST/.zscripts" \
+                 "$DST/examples" \
+                 "$DST/tool-results" \
+                 "$DST/download" \
+                 "$DST/node_modules" \
+                 "$DST/.next" \
+                 "$DST/out" \
+                 "$DST/logs" \
+                 "$DST/public-repo"
+          rm -f  "$DST/worklog.md" \
+                 "$DST/evolution.txt" \
+                 "$DST/README.md" \
+                 "$DST/.gitignore" \
+                 "$DST/.env" \
+                 "$DST"/.env.* \
+                 "$DST/.rebuild-trigger" \
+                 "$DST/Caddyfile" \
+                 "$DST/package.json" \
+                 "$DST/tsconfig.json" \
+                 "$DST/next.config.ts" \
+                 "$DST/tailwind.config.ts" \
+                 "$DST/postcss.config.mjs" \
+                 "$DST/eslint.config.mjs" \
+                 "$DST/components.json" \
+                 "$DST/bun.lock" \
+                 "$DST/package-lock.json" \
+                 "$DST/salesforce-analysis.json" \
+                 "$DST/salesforce-page.json" \
+                 "$DST"/*.md \
+                 "$DST"/*.pdf \
+                 "$DST"/*.py \
+                 "$DST"/*.tsx \
+                 "$DST"/*.ts \
+                 "$DST"/*.sh \
+                 "$DST"/*.txt \
+                 "$DST/lightweight-server.js" \
+                 "$DST/seed-direct.js" \
+                 "$DST/public/token.js" \
+                 "$DST/spa/token.js" \
+                 "$DST/ADVANCED_EVOLUTION_ROADMAP.txt" 2>/dev/null || true
+
+          # Phase 2: rsync with --delete but NOT --delete-excluded.
+          rsync -av --delete \
+            --exclude='.git/' \
+             \
+            --exclude='public-repo/' \
+            --exclude='.gitignore' \
+            --exclude='.env' \
+            --exclude='.env.*' \
+            --exclude='.rebuild-trigger' \
+            --exclude='/dev-scripts/' \
+            --exclude='/src/' \
+            --exclude='/prisma/' \
+            --exclude='/scripts/' \
+            --exclude='/tests/' \
+            --exclude='/db/' \
+            --exclude='/mini-services/' \
+            --exclude='/.zscripts/' \
+            --exclude='/examples/' \
+            --exclude='/tool-results/' \
+            --exclude='/download/' \
+            --exclude='/node_modules/' \
+            --exclude='/.next/' \
+            --exclude='/out/' \
+            --exclude='/logs/' \
+            --exclude='/docs/' \
+            --exclude='worklog.md' \
+            --exclude='evolution.txt' \
+            --exclude='README.md' \
+            --exclude='*.md' \
+            --exclude='*.pdf' \
+            --exclude='*.py' \
+            --exclude='*.tsx' \
+            --exclude='*.ts' \
+            --exclude='*.sh' \
+            --exclude='*.txt' \
+            --exclude='/package.json' \
+            --exclude='/tsconfig.json' \
+            --exclude='/next.config.ts' \
+            --exclude='/tailwind.config.ts' \
+            --exclude='/postcss.config.mjs' \
+            --exclude='/eslint.config.mjs' \
+            --exclude='/components.json' \
+            --exclude='/bun.lock' \
+            --exclude='/package-lock.json' \
+            --exclude='/Caddyfile' \
+            --exclude='/salesforce-analysis.json' \
+            --exclude='/salesforce-page.json' \
+            --exclude='/lightweight-server.js' \
+            --exclude='/seed-direct.js' \
+            --exclude='/public/token.js' \
+            --exclude='/spa/token.js' \
+            "$SRC/" "$DST/"
+
+          # Ensure Pages serves _next/ and other underscore-prefixed paths.
+          touch "$DST/.nojekyll"
+
+          # ====================================================================
+          # PATH REWRITE: Demo9AISupChn → Demo9AISupChn
+          # ====================================================================
+          # The SPA was originally built for /Demo9AISupChn/cc-app/ and has
+          # absolute paths baked into HTML, JS, and CSS. Rewrite all
+          # references so the SPA works at /Demo9AISupChn/cc-app/.
+          # ====================================================================
+          echo ""
+          echo "=== Rewriting Demo9AISupChn → Demo9AISupChn in all files ==="
+          cd "$DST"
+          REPLACED=0
+          for f in $(find . -type f \( -name '*.html' -o -name '*.js' -o -name '*.css' -o -name '*.json' -o -name '*.txt' \) -not -path './.git/*'); do
+            if grep -q 'Demo9AISupChn' "$f" 2>/dev/null; then
+              sed -i 's|Demo9AISupChn|Demo9AISupChn|g' "$f"
+              REPLACED=$((REPLACED + 1))
+              echo "  rewritten: $f"
+            fi
+          done
+          echo "  Total files rewritten: $REPLACED"
+          cd "$WORKSPACE"
+
+          # ====================================================================
+          # Also update the validate-pages.yml stale reference check to
+          # look for the right patterns (AISupChn9-Advance instead of
+          # AISupChn9-Advance).
+          # ====================================================================
+          if [ -f "$DST/.github/workflows/validate-pages.yml" ]; then
+            sed -i 's|AISupChn9-Advance|AISupChn9-Advance|g; s|AISupChn-preview|AISupChn9-Advance|g' "$DST/.github/workflows/validate-pages.yml"
+            echo "  Updated validate-pages.yml stale reference patterns"
+          fi
+
+          # Git operations
+          git -C "$DST" config user.name  "github-actions[bot]"
+          git -C "$DST" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C "$DST" add -A
+
+          if git -C "$DST" diff --cached --quiet; then
+            echo "No changes to sync."
+          else
+            git -C "$DST" commit -m "auto: mirror from AISupChn9-Advance @ ${GITHUB_SHA::7}"
+            git -C "$DST" push --force "https://x-access-token:${{ secrets.MIRROR_TOKEN }}@github.com/testdemoqwenai2025-creator/Demo9AISupChn.git" main 2>&1 \
+              | sed "s|x-access-token:[^@]*@|***@|g"
+            echo "Pushed to Demo9AISupChn — its validate-pages workflow will publish Pages."
+          fi
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "### Sync result" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Source: \`AISupChn9-Advance@${GITHUB_SHA::7}\`" >> $GITHUB_STEP_SUMMARY
+          echo "Target: [Demo9AISupChn](https://github.com/testdemoqwenai2025-creator/Demo9AISupChn)" >> $GITHUB_STEP_SUMMARY
+          echo "Pages:  https://testdemoqwenai2025-creator.github.io/Demo9AISupChn/" >> $GITHUB_STEP_SUMMARY
