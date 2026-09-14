@@ -1420,7 +1420,7 @@
       const btn = document.createElement('button');
       btn.id = 'cc-tm-trigger-btn';
       btn.style.cssText = [
-        'position: fixed', 'bottom: 140px', 'right: 20px', 'z-index: 9999',
+        'position: fixed', 'bottom: 140px', 'right: 150px', 'z-index: 9999',
         'padding: 12px 20px', 'border-radius: 12px',
         'background: linear-gradient(135deg, #8b5cf6, #ec4899)',
         'color: #fff', 'border: none', 'font-size: 13px', 'font-weight: 700',

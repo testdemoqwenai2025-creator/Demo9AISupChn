@@ -105,7 +105,7 @@
     style.textContent = `
       /* Floating Button */
       #cc-ai-trigger-btn {
-        position: fixed; bottom: 200px; right: 20px; z-index: 9999;
+        position: fixed; bottom: 170px; right: 150px; z-index: 9999;
         padding: 12px 20px; border-radius: 12px;
         background: linear-gradient(135deg, #f59e0b, #ef4444);
         color: #fff; border: none; font-size: 13px; font-weight: 700;
