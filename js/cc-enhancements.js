@@ -262,7 +262,7 @@
     btn.setAttribute('aria-label', 'Open AI Supply Chain Expert chat');
     // Override the CSS position with inline styles (inline takes precedence)
     btn.style.position = 'fixed';
-    btn.style.bottom = '80px';
+    btn.style.bottom = '140px';
     btn.style.right = '150px';
     btn.style.zIndex = '9999';
     // Make badge position relative to button (not affecting button position)
