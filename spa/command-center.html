@@ -218,4 +218,56 @@ document.addEventListener("keydown",function(e){if(e.key==="Escape"){ccAuthClose
 <script src="/Demo9AISupChn/js/tender-management.js" defer></script>
 <script src="/Demo9AISupChn/js/platform-analytics.js" defer></script>
 <script src="/Demo9AISupChn/js/cc-enhancements.js" defer></script>
+
+<script>
+// Theme toggle function (replaces React's toggleTheme)
+function toggleTheme() {
+  var html = document.documentElement;
+  var current = html.classList.contains('dark') ? 'dark' : 'light';
+  var newTheme = current === 'dark' ? 'light' : 'dark';
+  if (newTheme === 'light') {
+    html.classList.remove('dark');
+    localStorage.setItem('cc-theme', 'light');
+  } else {
+    html.classList.add('dark');
+    localStorage.setItem('cc-theme', 'dark');
+  }
+  console.log('[theme] toggled to: ' + newTheme);
+}
+
+// Ensure floating buttons are visible — check every 500ms for 10 seconds
+(function() {
+  var checks = 0;
+  function ensureButtonsVisible() {
+    checks++;
+    if (checks > 20) return; // 10 seconds max
+    
+    var buttons = ['cc-om-trigger-btn', 'cc-tm-trigger-btn', 'cc-pa-trigger-btn', 'cc-ai-trigger-btn'];
+    for (var i = 0; i < buttons.length; i++) {
+      var btn = document.getElementById(buttons[i]);
+      if (btn) {
+        // Force position fixed and correct stacking
+        btn.style.position = 'fixed';
+        btn.style.zIndex = '9999';
+        btn.style.right = '150px'; // left of side banner
+        btn.style.display = 'flex';
+        btn.style.visibility = 'visible';
+        btn.style.opacity = '1';
+        
+        // Stack buttons vertically
+        var bottoms = {'cc-om-trigger-btn': '80px', 'cc-ai-trigger-btn': '140px', 'cc-tm-trigger-btn': '200px', 'cc-pa-trigger-btn': '260px'};
+        btn.style.bottom = bottoms[buttons[i]] || '80px';
+      }
+    }
+    
+    setTimeout(ensureButtonsVisible, 500);
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() { setTimeout(ensureButtonsVisible, 1000); });
+  } else {
+    setTimeout(ensureButtonsVisible, 1000);
+  }
+})();
+</script>
 </body></html>
