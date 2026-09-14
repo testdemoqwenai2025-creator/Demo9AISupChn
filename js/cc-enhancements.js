@@ -260,7 +260,13 @@
       <span class="badge">10</span>
     `;
     btn.setAttribute('aria-label', 'Open AI Supply Chain Expert chat');
-    btn.style.position = 'relative'; // for badge positioning
+    // Override the CSS position with inline styles (inline takes precedence)
+    btn.style.position = 'fixed';
+    btn.style.bottom = '80px';
+    btn.style.right = '150px';
+    btn.style.zIndex = '9999';
+    // Make badge position relative to button (not affecting button position)
+    btn.style.display = 'flex';
     btn.onclick = openPanel;
     document.body.appendChild(btn);
     console.log('[cc-enhancements] AI Expert chat button injected');
