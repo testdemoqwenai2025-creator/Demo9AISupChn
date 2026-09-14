@@ -283,4 +283,45 @@ kbd { background: rgba(16, 185, 129, 0.05) !important; border: 1px solid rgba(16
 <script src="/Demo9AISupChn/js/tender-management.js" defer></script>
 <script src="/Demo9AISupChn/js/platform-analytics.js" defer></script>
 <script src="/Demo9AISupChn/js/cc-enhancements.js" defer></script>
+
+<script>
+// Standalone theme toggle — works without React hydration
+(function() {
+  function setupToggle() {
+    var btn = document.querySelector('[aria-label="Toggle theme"]');
+    if (!btn) {
+      setTimeout(setupToggle, 500);
+      return;
+    }
+    // Remove any existing React handler by cloning
+    var newBtn = btn.cloneNode(true);
+    btn.parentNode.replaceChild(newBtn, btn);
+    
+    newBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var html = document.documentElement;
+      var isDark = html.classList.contains('dark');
+      if (isDark) {
+        html.classList.remove('dark');
+        localStorage.setItem('cc-theme', 'light');
+        newBtn.title = 'Switch to Dark Mode';
+        console.log('[theme] Switched to LIGHT mode');
+      } else {
+        html.classList.add('dark');
+        localStorage.setItem('cc-theme', 'dark');
+        newBtn.title = 'Switch to Light Mode';
+        console.log('[theme] Switched to DARK mode');
+      }
+    });
+    console.log('[theme] Toggle button handler attached');
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() { setTimeout(setupToggle, 500); });
+  } else {
+    setTimeout(setupToggle, 500);
+  }
+})();
+</script>
 </body></html>
