@@ -1,0 +1,63 @@
+# =====================================================================
+# daily-followup.yml — OPC Pipeline: Daily reply check + status update
+# =====================================================================
+# Runs every day at 9am UTC. Checks for Gmail replies since yesterday,
+# updates prospect statuses in Google Sheets, sends Slack notification
+# for hot leads, and triggers win-back emails for cold leads.
+#
+# Uses Google Apps Script API (via service account) to query Gmail.
+# =====================================================================
+
+name: OPC — Daily Reply Check
+
+on:
+  schedule:
+    # 9:00 AM UTC every weekday (Monday-Friday)
+    - cron: '0 9 * * 1-5'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  daily-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: scripts/requirements.txt
+
+      - name: 📦 Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r scripts/requirements.txt
+
+      - name: 📬 Check Gmail replies + update CRM
+        env:
+          GOOGLE_SERVICE_ACCOUNT_EMAIL: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_EMAIL }}
+          GOOGLE_PRIVATE_KEY: ${{ secrets.GOOGLE_PRIVATE_KEY }}
+          GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}  # testdemoqwenai2025@gmail.com
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          python scripts/check_replies.py \
+            --sheet-id "$GOOGLE_SHEET_ID" \
+            --worksheet "Prospects" \
+            --gmail-user "$GMAIL_USER" \
+            --since 24h
+
+      - name: 📊 Generate daily summary
+        run: |
+          python scripts/daily_summary.py \
+            --sheet-id "${{ secrets.GOOGLE_SHEET_ID }}" \
+            --worksheet "Prospects" \
+            --output docs/daily-summary-$(date +%Y-%m-%d).md
+          cat docs/daily-summary-*.md | tail -50 >> $GITHUB_STEP_SUMMARY
