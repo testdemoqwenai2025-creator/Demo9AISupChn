@@ -1,0 +1,22 @@
+[
+  { "id": "PRT-SHA", "name": "Port of Shanghai", "country": "China", "lat": 31.23, "lng": 121.47, "throughput": 47000000, "congestion": "High", "risk": 62, "waitTime": 72, "status": "Operational", "type": "container" },
+  { "id": "PRT-SIN", "name": "Port of Singapore", "country": "Singapore", "lat": 1.27, "lng": 103.84, "throughput": 37200000, "congestion": "Medium", "risk": 35, "waitTime": 24, "status": "Operational", "type": "container" },
+  { "id": "PRT-RTM", "name": "Port of Rotterdam", "country": "Netherlands", "lat": 51.95, "lng": 4.07, "throughput": 15300000, "congestion": "Medium", "risk": 28, "waitTime": 18, "status": "Operational", "type": "container" },
+  { "id": "PRT-LAX", "name": "Port of Los Angeles", "country": "USA", "lat": 33.74, "lng": -118.27, "throughput": 10900000, "congestion": "Medium", "risk": 22, "waitTime": 12, "status": "Operational", "type": "container" },
+  { "id": "PRT-HAM", "name": "Port of Hamburg", "country": "Germany", "lat": 53.55, "lng": 9.93, "throughput": 8500000, "congestion": "Low", "risk": 20, "waitTime": 6, "status": "Operational", "type": "container" },
+  { "id": "PRT-BSN", "name": "Port of Busan", "country": "South Korea", "lat": 35.10, "lng": 129.04, "throughput": 22000000, "congestion": "Medium", "risk": 38, "waitTime": 20, "status": "Operational", "type": "container" },
+  { "id": "PRT-SZN", "name": "Port of Shenzhen", "country": "China", "lat": 22.50, "lng": 113.93, "throughput": 30000000, "congestion": "High", "risk": 55, "waitTime": 48, "status": "Operational", "type": "container" },
+  { "id": "PRT-NGB", "name": "Port of Ningbo-Zhoushan", "country": "China", "lat": 29.87, "lng": 121.55, "throughput": 33400000, "congestion": "High", "risk": 50, "waitTime": 36, "status": "Operational", "type": "container" },
+  { "id": "PRT-GZI", "name": "Port of Guangzhou", "country": "China", "lat": 23.10, "lng": 113.26, "throughput": 25000000, "congestion": "Medium", "risk": 45, "waitTime": 24, "status": "Operational", "type": "container" },
+  { "id": "PRT-DXB", "name": "Port of Jebel Ali (Dubai)", "country": "UAE", "lat": 25.01, "lng": 55.06, "throughput": 13900000, "congestion": "Low", "risk": 25, "waitTime": 8, "status": "Operational", "type": "container" },
+  { "id": "PRT-ANT", "name": "Port of Antwerp", "country": "Belgium", "lat": 51.22, "lng": 4.40, "throughput": 12100000, "congestion": "Low", "risk": 18, "waitTime": 6, "status": "Operational", "type": "container" },
+  { "id": "PRT-LGB", "name": "Port of Long Beach", "country": "USA", "lat": 33.75, "lng": -118.19, "throughput": 8100000, "congestion": "Medium", "risk": 25, "waitTime": 14, "status": "Operational", "type": "container" },
+  { "id": "PRT-HOU", "name": "Port of Houston", "country": "USA", "lat": 29.71, "lng": -95.05, "throughput": 3500000, "congestion": "Low", "risk": 22, "waitTime": 4, "status": "Operational", "type": "container" },
+  { "id": "PRT-NYC", "name": "Port of New York/New Jersey", "country": "USA", "lat": 40.67, "lng": -74.04, "throughput": 7600000, "congestion": "Medium", "risk": 28, "waitTime": 16, "status": "Operational", "type": "container" },
+  { "id": "PRT-MUM", "name": "Jawaharlal Nehru Port (Mumbai)", "country": "India", "lat": 18.95, "lng": 72.95, "throughput": 5600000, "congestion": "High", "risk": 52, "waitTime": 48, "status": "Operational", "type": "container" },
+  { "id": "PRT-CMN", "name": "Port of Casablanca", "country": "Morocco", "lat": 33.59, "lng": -7.62, "throughput": 1400000, "congestion": "Low", "risk": 65, "waitTime": 10, "status": "Operational", "type": "container" },
+  { "id": "PRT-SUA", "name": "Port of Suez", "country": "Egypt", "lat": 29.97, "lng": 32.55, "throughput": 2100000, "congestion": "Medium", "risk": 68, "waitTime": 24, "status": "Operational", "type": "container" },
+  { "id": "PRT-PAN", "name": "Port of Balboa (Panama)", "country": "Panama", "lat": 8.90, "lng": -79.57, "throughput": 3300000, "congestion": "Medium", "risk": 42, "waitTime": 18, "status": "Operational", "type": "container" },
+  { "id": "PRT-VAL", "name": "Port of Valparaiso", "country": "Chile", "lat": -33.05, "lng": -71.63, "throughput": 1100000, "congestion": "Low", "risk": 30, "waitTime": 8, "status": "Operational", "type": "container" },
+  { "id": "PRT-SYD", "name": "Port of Sydney", "country": "Australia", "lat": -33.85, "lng": 151.21, "throughput": 2600000, "congestion": "Low", "risk": 15, "waitTime": 4, "status": "Operational", "type": "container" }
+]
